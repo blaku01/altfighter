@@ -3,3 +3,6 @@ psycopg2>=2.8
 djangorestframework
 markdown       
 django-filter
+celery[redis]
+django-annoying
+numpy

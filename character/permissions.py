@@ -3,6 +3,19 @@ from character.models import Character
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 
+
+class DisallowPatch(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'PATCH':
+            return False
+        return True
+
+class DisallowPut(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'PUT':
+            return False
+        return True
+
 class HasChampionAlready(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == 'POST':
@@ -20,6 +33,6 @@ class HasChampionAlready(permissions.BasePermission):
 
 class IsOwnerObject(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method == 'DELETE':
+        if request.method == 'DELETE' or request.method == 'PUT':
             return obj.created_by == request.user
         return True

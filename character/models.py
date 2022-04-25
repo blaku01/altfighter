@@ -9,12 +9,13 @@ class Stats(models.Model):
     luck = models.IntegerField(blank=True, null=True)
 
     def __add__(self, obj):
+
         if obj:
             strength = self.strength + obj.strength
             agility = self.agility + obj.agility
             vitality = self.vitality + obj.vitality
             luck = self.luck + obj.luck
-            return Stats(strength, agility, vitality, luck)
+            return Stats(strength=strength, agility=agility, vitality=vitality, luck=luck)
         return self
 
     
@@ -22,48 +23,61 @@ class Stats(models.Model):
         text = f"{self.strength} {self.agility} {self.vitality} {self.luck}"
         return text
 
-class Item(models.Model):
-    name = models.CharField(null=True, max_length=10)
-    stats = models.ForeignKey(Stats, null=True, blank=True, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-class Weapon(Item):
-    damage = models.IntegerField(blank=True, default=1)
+    def calculate_total_stats(self):
+        return self.strength + self.agility + self.vitality + self.luck
 
 
 class Character(models.Model):
-    DEFAULT_STATS_ID = 1
-    nickname = models.CharField(null=True, max_length=10)
-    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)    
+    nickname = models.CharField(null=True, unique=True, max_length=10)
+    created_by = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    currency = models.IntegerField(null=True, blank=True, default=0)
     level = models.IntegerField(null=True,blank=True,  default=1)
     battle_points = models.IntegerField(null=True, blank=True, default = 0)
     current_exp = models.IntegerField(null=True, blank=True, default=1)
-    base_stats = models.ForeignKey(Stats, null=True, blank=True, default=DEFAULT_STATS_ID, on_delete=models.CASCADE, related_name='base_stats')
-
-    weapon = models.ForeignKey(Weapon, null=True,blank=True,  on_delete=models.CASCADE, related_name='weapon')
-    helmet = models.ForeignKey(Item, null=True,blank=True,  on_delete=models.CASCADE, related_name='helmet')
-    armor = models.ForeignKey(Item, null=True,blank=True,  on_delete=models.CASCADE, related_name='armor')
-    graves = models.ForeignKey(Item, null=True,blank=True,  on_delete=models.CASCADE, related_name='graves')
-    boots = models.ForeignKey(Item, null=True,blank=True,  on_delete=models.CASCADE, related_name='boots')
-    necklase = models.ForeignKey(Item, null=True,blank=True,  on_delete=models.CASCADE, related_name='necklase')
-
+    base_stats = models.OneToOneField(Stats,null=True, blank=True, on_delete=models.CASCADE)
 
     @property
     def exp_to_next_level(self):
         return self.level^3 - self.current_exp
 
     @property
+    def equipped_items(self):
+        items = Item.objects.filter(belongs_to=self, equipped=True)
+        return items
+
+    @property
+    def backpack(self):
+        items = Item.objects.filter(belongs_to=self, equipped=False, pucharsed=True)
+        return items
+
+    @property
+    def shop(self):
+        items = Item.objects.filter(belongs_to=self, pucharsed=False)
+        return items
+
+    @property
     def total_stats(self):
-        stats = self.base_stats + self.helmet + self.armor + self.graves + self.boots + self.necklase
-        if self.weapon:
-            stats += self.weapon.stats
+        stats= self.base_stats
+        for i in [item.stats for item in self.equipped_items]:
+            stats += i
         return stats
     
+
     def level_up(self):
         self.level += 1
         self.current_exp = 1
 
     def __str__(self):
         return self.nickname
+
+class Item(models.Model):
+    name = models.CharField(null=True, max_length=10)
+    stats = models.OneToOneField(Stats, null=True, blank=True, on_delete=models.CASCADE)
+    damage = models.IntegerField(blank=True, default=0)
+    equipped = models.BooleanField(null=True, blank=True, default=False)
+    pucharsed = models.BooleanField(null=True, blank=True, default=False)
+    price = models.IntegerField(null=True)
+    belongs_to = models.ForeignKey(Character, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
