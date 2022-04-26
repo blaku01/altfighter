@@ -47,12 +47,12 @@ class Character(models.Model):
 
     @property
     def backpack(self):
-        items = Item.objects.filter(belongs_to=self, equipped=False, pucharsed=True)
+        items = Item.objects.filter(belongs_to=self, equipped=False, purchased=True)
         return items
 
     @property
     def shop(self):
-        items = Item.objects.filter(belongs_to=self, pucharsed=False)
+        items = Item.objects.filter(belongs_to=self, purchased=False)
         return items
 
     @property
@@ -61,6 +61,11 @@ class Character(models.Model):
         for i in [item.stats for item in self.equipped_items]:
             stats += i
         return stats
+    
+    @property
+    def missions(self):
+        missions = Mission.objects.filter(belongs_to=self)
+        return missions
     
 
     def level_up(self):
@@ -75,8 +80,20 @@ class Item(models.Model):
     stats = models.OneToOneField(Stats, null=True, blank=True, on_delete=models.CASCADE)
     damage = models.IntegerField(blank=True, default=0)
     equipped = models.BooleanField(null=True, blank=True, default=False)
-    pucharsed = models.BooleanField(null=True, blank=True, default=False)
+    purchased = models.BooleanField(null=True, blank=True, default=False)
     price = models.IntegerField(null=True)
+    belongs_to = models.ForeignKey(Character, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Mission(models.Model):
+    name = models.CharField(null=True, max_length = 30)
+    exp = models.IntegerField()
+    currency = models.IntegerField()
+    time = models.TimeField()
+    time_started = models.DateTimeField()
     belongs_to = models.ForeignKey(Character, on_delete=models.CASCADE)
 
     def __str__(self):

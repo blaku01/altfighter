@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from character.models import Character, Stats, Item
+from character.models import Character, Stats, Item, Mission
 from django.contrib.auth.models import User
 from rest_framework.reverse import reverse
 from character.tasks import refresh_character_shops
@@ -30,33 +30,38 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['url', 'username', 'email', 'groups']
 
+class MissionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Mission
+        fields = ['name', 'exp', 'currency', 'time']
 
 class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     total_stats = StatsSerializer(read_only=True)
     shop = ItemSerializer(many=True, read_only=True)
     equipped_items = ItemSerializer(many=True, read_only=True)
     backpack = ItemSerializer(many=True, read_only=True)
+    missions = MissionSerializer(many=True, read_only=True)
     class Meta:
         model = Character
-        fields = ['url', 'nickname', 'base_stats', 'total_stats', 'equipped_items', 'backpack', 'shop']
+        fields = ['url', 'nickname', 'base_stats', 'total_stats', 'equipped_items', 'backpack', 'shop', 'missions']
         read_only_fields = ('level', 'battle_points', 'current_exp')
         # extra_kwargs = {'created_by': {'default': serializers.CurrentUserDefault()}} #doesnt work after changing created_by to OneToOneField
         depth = 0
     
     def get_total_stats(self, obj):
-        print(datetime.datetime.now())
         return obj.total_stats
 
     def get_equipped_items(self, obj):
-        print(datetime.datetime.now())
         return obj.equipped_items
     
     def get_backpack(self, obj):
-        print(datetime.datetime.now())
         return obj.backpack
     
     def get_shop(self, obj):
         return obj.shop
+    
+    def get_missions(self, obj):
+        return obj.missions
     
     def to_representation(self, instance):
         representation =  super().to_representation(instance)

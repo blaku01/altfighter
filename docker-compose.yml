@@ -1,25 +1,48 @@
-version: "3.9"
+version: "3.8"
    
 services:
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    env_file:
-      - .env
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - redis
-
-  redis:
-    image: redis:6-alpine
-  
+    django:
+        build: .
+        container_name: django
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - .:/usr/src/app/
+        ports:
+            - "8000:8000"
+        environment:
+            - POSTGRES_NAME=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=Me``tqDSm`*&4]BK
+        env_file:
+            - .env
+        depends_on:
+            - pgdb
+            - redis
+    celery:
+        build: .
+        command: celery -A altfighter worker -l INFO
+        volumes:
+            - .:/usr/src/app
+        environment:
+            - POSTGRES_NAME=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=Me``tqDSm`*&4]BK
+        env_file:
+            - .env
+        depends_on:
+            - django
+            - redis
+    pgdb:
+        image: postgres
+        container_name: pgdb
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=Me``tqDSm`*&4]BK
+        volumes:
+            - pgdata:/var/lib/postgresql/data/
+    redis:
+        image: "redis:alpine"
+        
+volumes:
+    pgdata:
