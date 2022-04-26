@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Stats(models.Model):
+    class Meta:
+        abstract = True
     strength = models.IntegerField(blank=True, null=True)
     agility = models.IntegerField(blank=True, null=True)
     vitality = models.IntegerField(blank=True, null=True)
@@ -15,7 +17,7 @@ class Stats(models.Model):
             agility = self.agility + obj.agility
             vitality = self.vitality + obj.vitality
             luck = self.luck + obj.luck
-            return Stats(strength=strength, agility=agility, vitality=vitality, luck=luck)
+            return {'strength':strength, 'agility':agility, 'vitality':vitality, 'luck':luck}
         return self
 
     
@@ -27,14 +29,13 @@ class Stats(models.Model):
         return self.strength + self.agility + self.vitality + self.luck
 
 
-class Character(models.Model):
+class Character(Stats):
     nickname = models.CharField(null=True, unique=True, max_length=10)
     created_by = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     currency = models.IntegerField(null=True, blank=True, default=0)
     level = models.IntegerField(null=True,blank=True,  default=1)
     battle_points = models.IntegerField(null=True, blank=True, default = 0)
     current_exp = models.IntegerField(null=True, blank=True, default=1)
-    base_stats = models.OneToOneField(Stats,null=True, blank=True, on_delete=models.CASCADE)
 
     @property
     def exp_to_next_level(self):
@@ -57,9 +58,10 @@ class Character(models.Model):
 
     @property
     def total_stats(self):
-        stats= self.base_stats
-        for i in [item.stats for item in self.equipped_items]:
-            stats += i
+        stats = self
+        print(self.strength)
+        for item in self.equipped_items:
+            self += item
         return stats
     
     @property
@@ -75,9 +77,8 @@ class Character(models.Model):
     def __str__(self):
         return self.nickname
 
-class Item(models.Model):
+class Item(Stats):
     name = models.CharField(null=True, max_length=10)
-    stats = models.OneToOneField(Stats, null=True, blank=True, on_delete=models.CASCADE)
     damage = models.IntegerField(blank=True, default=0)
     equipped = models.BooleanField(null=True, blank=True, default=False)
     purchased = models.BooleanField(null=True, blank=True, default=False)
@@ -93,8 +94,14 @@ class Mission(models.Model):
     exp = models.IntegerField()
     currency = models.IntegerField()
     time = models.TimeField()
-    time_started = models.DateTimeField()
+    time_started = models.DateTimeField(blank=True, null=True)
     belongs_to = models.ForeignKey(Character, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+    
+    @property
+    def has_started(self):
+        if self.time_started is not None:
+            return True
+        return False

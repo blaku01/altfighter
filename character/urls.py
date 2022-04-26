@@ -4,7 +4,6 @@ from character import views
 from django.urls import reverse
 router = routers.SimpleRouter()
 
-router.register(r'statss', views.StatsViewSet)
 router.register(r'characters', views.CharacterViewSet)
 router.register(r'users', views.UserViewSet)
 router.register(r'items', views.ItemViewSet)

@@ -1,7 +1,7 @@
 from multiprocessing.sharedctypes import Value
 from rest_framework import viewsets, permissions
-from character.serializers import CharacterSerializer, UserSerializer, StatsSerializer, ItemSerializer, CharacterListSerializer
-from character.models import Character, Stats, Item
+from character.serializers import CharacterSerializer, UserSerializer, ItemSerializer, CharacterListSerializer, MissionSerializer
+from character.models import Character, Item, Mission
 from django.contrib.auth.models import User
 from character.permissions import HasChampionAlready, IsOwnerObject, DisallowPatch, DisallowPut
 from django.shortcuts import get_object_or_404
@@ -9,12 +9,8 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import Response
 from rest_framework.exceptions import APIException
 from rest_framework.decorators import action
-
-class StatsViewSet(viewsets.ModelViewSet):
-    queryset = Stats.objects.all()
-    serializer_class = StatsSerializer
-    permission_classes = [permissions.IsAdminUser]
-
+from character.tasks import refresh_character_missions
+from django.utils.timezone import now
 class CharacterViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Characters to be viewed or edited.
@@ -48,7 +44,18 @@ class CharacterViewSet(viewsets.ModelViewSet):
         else:
             raise PermissionDenied({"message":"You don't have permission to access",
                                 "object_id": item.id})
-    
+
+    @action(detail=True, url_path='purchase_item')
+    def item_shop(self, request, pk=None):
+        character = get_object_or_404(Character, pk=pk)
+        if character.created_by == request.user:
+            shop = character.shop
+            serialized_item = ItemSerializer(shop, many=True, context={'request': request}).data
+            return Response(serialized_item)
+        else:
+            raise PermissionDenied({"message":"You don't have permission to access",
+                                "object_id": character.id})
+
     @action(detail=True, url_path='equip_item/(?P<item_pk>[^/.]+)')
     def equip_item(self, request, item_pk, pk=None):
         item = get_object_or_404(Item, pk=item_pk)
@@ -76,6 +83,54 @@ class CharacterViewSet(viewsets.ModelViewSet):
 
         raise PermissionDenied({"message":"You don't have permission to access",
                             "object_id": item.id})
+
+    @action(detail=True, url_path='equip_item')
+    def backpack(self, request, pk=None):
+        character = get_object_or_404(Character, pk=pk)
+        if character.created_by == request.user:
+            backpack = character.backpack
+            serialized_item = ItemSerializer(backpack, many=True, context={'request': request}).data
+            return Response(serialized_item)
+        else:
+            raise PermissionDenied({"message":"You don't have permission to access",
+                                "object_id": character.id})
+    
+    @action(detail=True, url_path='take_mission/(?P<item_pk>[^/.]+)')
+    def take_mission(self, request, item_pk, pk=None):
+        mission = get_object_or_404(Mission, pk=item_pk)
+        if mission.belongs_to.created_by == request.user:
+            user_missions = Mission.objects.filter(belongs_to=mission.belongs_to)
+            if mission.has_started:
+                mission.time_started = None
+                mission.save()
+                return Response(MissionSerializer(user_missions, many=True, context={'request': request}).data)
+            started_mission = False
+            for mission in user_missions:
+                if mission.has_started:
+                    started_mission = True
+            if started_mission:
+                raise APIException('You already started a mission')
+            
+            mission.time_started = now()
+            mission.save()
+            serialized_mission = MissionSerializer(mission, context={'request': request}).data
+            return Response(serialized_mission)
+
+
+        raise PermissionDenied({"message":"You don't have permission to access",
+                            "object_id": mission.id})
+
+    @action(detail=True, url_path='take_mission')
+    def missions(self, request, pk=None):
+        character = get_object_or_404(Character, pk=pk)
+        if character.created_by == request.user:
+            missions = character.missions
+            serialized_item = MissionSerializer(missions, many=True, context={'request': request}).data
+            return Response(serialized_item)
+        else:
+            raise PermissionDenied({"message":"You don't have permission to access",
+                                "object_id": character.id})
+    
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

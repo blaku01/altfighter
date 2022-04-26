@@ -1,29 +1,17 @@
 from rest_framework import serializers
-from character.models import Character, Stats, Item, Mission
+from character.models import Character, Item, Mission
 from django.contrib.auth.models import User
-from rest_framework.reverse import reverse
-from character.tasks import refresh_character_shops
-import datetime
 
-class StatsSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Stats
-        fields = '__all__'
-
+class StatsSerializer(serializers.Serializer):
+    strength=serializers.IntegerField(min_value=0)
+    agility=serializers.IntegerField(min_value=0)
+    vitality=serializers.IntegerField(min_value=0)
+    luck=serializers.IntegerField(min_value=0)
+    
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
-    stats = StatsSerializer()
     class Meta:
         model = Item
-        fields = ['url','name', 'stats', 'price']
-
-    
-    def to_representation(self, instance):
-        representation =  super().to_representation(instance)
-        stats_representation = representation.pop('stats')
-        stats_representation.pop('url')
-        for key in stats_representation:
-            representation[key] = stats_representation[key]
-        return representation
+        fields = ['id','name', 'price', 'strength', 'agility', 'vitality', 'luck']
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -33,7 +21,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class MissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Mission
-        fields = ['name', 'exp', 'currency', 'time']
+        fields = ['id', 'name', 'exp', 'currency', 'time', 'time_started']
 
 class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     total_stats = StatsSerializer(read_only=True)
@@ -43,7 +31,7 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     missions = MissionSerializer(many=True, read_only=True)
     class Meta:
         model = Character
-        fields = ['url', 'nickname', 'base_stats', 'total_stats', 'equipped_items', 'backpack', 'shop', 'missions']
+        fields = ['url', 'nickname', 'strength', 'agility', 'vitality', 'luck', 'total_stats', 'equipped_items', 'backpack', 'shop', 'missions']
         read_only_fields = ('level', 'battle_points', 'current_exp')
         # extra_kwargs = {'created_by': {'default': serializers.CurrentUserDefault()}} #doesnt work after changing created_by to OneToOneField
         depth = 0
@@ -65,16 +53,15 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     
     def to_representation(self, instance):
         representation =  super().to_representation(instance)
-        stats_representation = representation.pop('total_stats')
-        stats_representation.pop('url')
-        for key in stats_representation:
-            representation[key] = stats_representation[key]
+        representation['base_stats'] = {}
+        representation['base_stats']['strength'] = representation.pop('strength')
+        representation['base_stats']['agility'] = representation.pop('agility')
+        representation['base_stats']['vitality'] = representation.pop('vitality')
+        representation['base_stats']['luck'] = representation.pop('luck')
         return representation
 
     def create(self, validated_data):
-        stats = Stats(strength=0, agility=0,vitality=0,luck=0)
-        stats.save()
-        character = Character.objects.create(**validated_data, base_stats = stats ,created_by=self.context['request'].user)
+        character = Character.objects.create(**validated_data,created_by=self.context['request'].user,strength=0, agility=0,vitality=0,luck=0)
         return character
     
 
