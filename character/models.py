@@ -1,25 +1,16 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
+from numpy import power
 
 # Create your models here.
 class Stats(models.Model):
     class Meta:
         abstract = True
-    strength = models.IntegerField(blank=True, null=True)
-    agility = models.IntegerField(blank=True, null=True)
-    vitality = models.IntegerField(blank=True, null=True)
-    luck = models.IntegerField(blank=True, null=True)
-
-    def __add__(self, obj):
-
-        if obj:
-            strength = self.strength + obj.strength
-            agility = self.agility + obj.agility
-            vitality = self.vitality + obj.vitality
-            luck = self.luck + obj.luck
-            return {'strength':strength, 'agility':agility, 'vitality':vitality, 'luck':luck}
-        return self
-
+    strength = models.IntegerField(blank=True, null=True, default=0)
+    agility = models.IntegerField(blank=True, null=True, default=0)
+    vitality = models.IntegerField(blank=True, null=True, default=0)
+    luck = models.IntegerField(blank=True, null=True, default=0)
     
     def __str__(self):
         text = f"{self.strength} {self.agility} {self.vitality} {self.luck}"
@@ -39,7 +30,7 @@ class Character(Stats):
 
     @property
     def exp_to_next_level(self):
-        return self.level^3 - self.current_exp
+        return power(self.level, 2) - self.current_exp
 
     @property
     def equipped_items(self):
@@ -58,11 +49,16 @@ class Character(Stats):
 
     @property
     def total_stats(self):
-        stats = self
-        print(self.strength)
+        strength = self.strength
+        agility = self.agility
+        vitality = self.vitality
+        luck = self.luck
         for item in self.equipped_items:
-            self += item
-        return stats
+            strength += item.strength
+            agility += item.agility
+            vitality += item.vitality
+            luck += item.luck
+        return {'strength':strength, 'agility':agility, 'vitality':vitality, 'luck':luck}
     
     @property
     def missions(self):

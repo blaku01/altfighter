@@ -1,7 +1,8 @@
-from django.urls import include, path
+from django.urls import include, path, reverse
 from rest_framework import routers
+
 from character import views
-from django.urls import reverse
+
 router = routers.SimpleRouter()
 
 router.register(r'characters', views.CharacterViewSet)

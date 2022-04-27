@@ -1,11 +1,13 @@
-from celery import shared_task
-from character.models import Item, Character, Mission
-from django.db import connection
-from django.contrib.auth.models import User
 import datetime
+
 import pytz
-from numpy.random import rand, choice, randint
+from celery import shared_task
+from django.contrib.auth.models import User
+from django.db import connection
 from numpy import ones
+from numpy.random import choice, rand, randint
+
+from character.models import Character, Item, Mission
 from character.utils import generate_place_name
 
 ITEM_TYPES = ['weapon', 'helmet', 'armor', 'necklease', 'leggings']
@@ -29,7 +31,7 @@ def refresh_character_shops():
                                                 damage=damages[i], strength=numbers[i][0], agility=numbers[i][1], vitality=numbers[i][2], luck=numbers[i][3]) for i in range(6)])
 
 @shared_task
-def refresh_character_missions():
+def refresh_every_character_missions():
     with connection.cursor() as cursor:
         today = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         last_week = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
@@ -38,14 +40,17 @@ def refresh_character_missions():
         for user in users_logged_within_week:
             character = Character.objects.filter(created_by=user).first()
             if character is not None:
-                missions = character.missions
-                missions.delete()
-                lvl = character.level
-                mission_times = randint(5, 15, size=3)
-                gold = randint(5, 10, size=3) * lvl
-                exp = 3 * lvl
-                gold_exp_ratio = rand(3)
-                exp_gold_ratio = ones(3) - gold_exp_ratio
-                gold = gold * gold_exp_ratio * mission_times
-                exp = exp_gold_ratio * exp * mission_times
-                missions = Mission.objects.bulk_create([Mission(name=generate_place_name(), exp=exp[i], currency=gold[i], time=f"00:{int(mission_times[i])}", belongs_to=character) for i in range(3)])
+                refresh_character_missions(character)
+
+def refresh_character_missions(character):
+    missions = character.missions
+    missions.delete()
+    lvl = character.level
+    mission_times = randint(5, 15, size=3)
+    gold = randint(5, 10, size=3) * lvl
+    exp = 3 * lvl
+    gold_exp_ratio = rand(3)
+    exp_gold_ratio = ones(3) - gold_exp_ratio
+    gold = gold * gold_exp_ratio * mission_times
+    exp = exp_gold_ratio * exp * mission_times
+    missions = Mission.objects.bulk_create([Mission(name=generate_place_name(), exp=exp[i], currency=gold[i], time=f"00:{int(mission_times[i])}", belongs_to=character) for i in range(3)])

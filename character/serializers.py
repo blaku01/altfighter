@@ -1,6 +1,8 @@
-from rest_framework import serializers
-from character.models import Character, Item, Mission
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from character.models import Character, Item, Mission
+from character.utils import when_mission_ends
 
 class StatsSerializer(serializers.Serializer):
     strength=serializers.IntegerField(min_value=0)
@@ -22,6 +24,7 @@ class MissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Mission
         fields = ['id', 'name', 'exp', 'currency', 'time', 'time_started']
+
 
 class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     total_stats = StatsSerializer(read_only=True)

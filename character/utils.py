@@ -1,7 +1,9 @@
-import random
-from character.models import Mission
 import datetime
+import random
+
 from django.utils import timezone
+
+from character.models import Mission
 
 first = ["Chelm", "Elm", "El", "Bur", "En", "Eg", "Pem", "Pen", "Edg", "Sud", "Sod", "Hors", "Dur", "Sun", "Nort", "Brad", "Farn", "Barn", "Dart", "Hart", "South", "Shaft", "Blan", "Rock", "Alf", "Wy", "Marl", "Staf", "Wet", "Cas", "Stain", "Whit", "Stap", "Brom", "Wych", "Watch", "Win", "Horn", "Mel", "Cook", "Hurst", "Ald", "Shriv", "Kings", "Clere", "Maiden", "Leather", "Brack","Brain", "Walt", "Prest", "Wen", "Flit", "Ash"]
 doubles = ["Bass", "Chipp", "Sodd", "Sudd", "Ell", "Burr", "Egg", "Emm", "Hamm", "Hann", "Cann", "Camm", "Camb", "Sund", "Pend", "End", "Warr", "Worr", "Hamp", "Roth", "Both", "Sir", "Cir", "Redd", "Wolv", "Mill", "Kett", "Ribb", "Dribb", "Fald", "Skell", "Chedd", "Chill", "Tipp", "Full", "Todd", "Abb", "Booth"]
@@ -62,18 +64,6 @@ def generate_place_name():
 
 
 
-def has_character_mission_ended(character):
-    missions = character.missions
-    for mission in missions:
-        if mission.time_started is not None:
-            print(timezone.now().timestamp() - mission.time_started.timestamp() - mission.time.minute * 60)
-            if timezone.now().timestamp() - mission.time_started.timestamp() - mission.time.minute * 60 > 0:
-                return mission
-    return False
-
-def has_mission_ended(mission):
-    if mission.time_started is not None:
-        print(timezone.now().timestamp() - mission.time_started.timestamp() - mission.time.minute * 60)
-        if timezone.now().timestamp() - mission.time_started.timestamp() - mission.time.minute * 60 > 0:
-            return mission
-    return False
+def when_mission_ends(mission):
+    time_left =  mission.time.minute * 60 + mission.time_started.timestamp() - timezone.now().timestamp()
+    return time_left

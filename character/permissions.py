@@ -1,4 +1,5 @@
 from rest_framework import permissions
+
 from character.models import Character
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
@@ -17,6 +18,7 @@ class DisallowPut(permissions.BasePermission):
         return True
 
 class HasChampionAlready(permissions.BasePermission):
+    message = 'You have a champion already!'
     def has_permission(self, request, view):
         if request.method == 'POST':
             try:
