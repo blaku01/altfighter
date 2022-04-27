@@ -68,11 +68,6 @@ class Character(Stats):
     def missions(self):
         missions = Mission.objects.filter(belongs_to=self)
         return missions
-    
-
-    def level_up(self):
-        self.level += 1
-        self.current_exp = 1
 
     def __str__(self):
         return self.nickname

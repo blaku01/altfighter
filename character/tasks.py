@@ -49,5 +49,3 @@ def refresh_character_missions():
                 gold = gold * gold_exp_ratio * mission_times
                 exp = exp_gold_ratio * exp * mission_times
                 missions = Mission.objects.bulk_create([Mission(name=generate_place_name(), exp=exp[i], currency=gold[i], time=f"00:{int(mission_times[i])}", belongs_to=character) for i in range(3)])
-
-#check if user ended mission

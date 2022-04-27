@@ -11,6 +11,8 @@ from rest_framework.exceptions import APIException
 from rest_framework.decorators import action
 from character.tasks import refresh_character_missions
 from django.utils.timezone import now
+from character.utils import has_mission_ended, has_character_mission_ended
+
 class CharacterViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Characters to be viewed or edited.
@@ -98,18 +100,17 @@ class CharacterViewSet(viewsets.ModelViewSet):
     @action(detail=True, url_path='take_mission/(?P<item_pk>[^/.]+)')
     def take_mission(self, request, item_pk, pk=None):
         mission = get_object_or_404(Mission, pk=item_pk)
+        has_mission_ended(mission)
         if mission.belongs_to.created_by == request.user:
             user_missions = Mission.objects.filter(belongs_to=mission.belongs_to)
             if mission.has_started:
                 mission.time_started = None
                 mission.save()
                 return Response(MissionSerializer(user_missions, many=True, context={'request': request}).data)
-            started_mission = False
-            for mission in user_missions:
-                if mission.has_started:
-                    started_mission = True
-            if started_mission:
-                raise APIException('You already started a mission')
+            for user_mission in user_missions:
+                if user_mission.has_started:
+                    raise APIException('You already started a mission')
+                
             
             mission.time_started = now()
             mission.save()
@@ -123,6 +124,25 @@ class CharacterViewSet(viewsets.ModelViewSet):
     @action(detail=True, url_path='take_mission')
     def missions(self, request, pk=None):
         character = get_object_or_404(Character, pk=pk)
+        mission_ended = has_character_mission_ended(character)
+        if mission_ended:
+            character.currency += mission_ended.currency
+            character.current_exp += mission_ended.exp
+            
+            while character.exp_to_next_level <= 0:
+                character.level += 1
+                character.exp = character.exp_to_next_level
+
+            character.save()
+            mission_ended.delete()
+
+            refresh_character_missions()
+
+            missions = character.missions
+            serialized_item = MissionSerializer(missions, many=True, context={'request': request}).data
+            return Response(serialized_item)
+
+        
         if character.created_by == request.user:
             missions = character.missions
             serialized_item = MissionSerializer(missions, many=True, context={'request': request}).data

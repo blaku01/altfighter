@@ -31,7 +31,7 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     missions = MissionSerializer(many=True, read_only=True)
     class Meta:
         model = Character
-        fields = ['url', 'nickname', 'strength', 'agility', 'vitality', 'luck', 'total_stats', 'equipped_items', 'backpack', 'shop', 'missions']
+        fields = ['url', 'nickname', 'level', 'current_exp', 'currency', 'strength', 'agility', 'vitality', 'luck', 'total_stats', 'equipped_items', 'backpack', 'shop', 'missions']
         read_only_fields = ('level', 'battle_points', 'current_exp')
         # extra_kwargs = {'created_by': {'default': serializers.CurrentUserDefault()}} #doesnt work after changing created_by to OneToOneField
         depth = 0
@@ -69,4 +69,4 @@ class CharacterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         fields = ['url', 'nickname', 'battle_points']
-    
+
