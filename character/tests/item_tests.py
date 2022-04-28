@@ -20,7 +20,7 @@ class EquipTestCase(APITestCase):
 
         self.character = Character.objects.create(nickname='character', created_by=self.user1)
 
-        self.item1 = Item.objects.create(name='sword', strength=1, agility=2, belongs_to=self.character)
+        self.item1 = Item.objects.create(name='sword', type=1, strength=1, agility=2, belongs_to=self.character)
 
         self.view = CharacterViewSet()
         self.view.basename = router.get_default_basename(CharacterViewSet)
@@ -72,7 +72,7 @@ class PurchaseTestCase(APITestCase):
 
         self.character = Character.objects.create(nickname='character', created_by=self.user1)
 
-        self.item1 = Item.objects.create(name='sword', strength=1, agility=2, belongs_to=self.character, price=10)
+        self.item1 = Item.objects.create(name='sword', type=1, strength=1, agility=2, belongs_to=self.character, price=10)
 
         self.view = CharacterViewSet()
         self.view.basename = router.get_default_basename(CharacterViewSet)

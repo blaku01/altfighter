@@ -7,10 +7,9 @@ from django.db import connection
 from numpy import ones
 from numpy.random import choice, rand, randint
 
-from character.models import Character, Item, Mission
-from character.utils import generate_place_name
+from character.models import Character, Item, Mission, ITEM_TYPES
+from character.utils import generate_place_name, generate_item_name
 
-ITEM_TYPES = ['weapon', 'helmet', 'armor', 'necklease', 'leggings']
 @shared_task
 def refresh_character_shops():
     with connection.cursor() as cursor:
@@ -25,9 +24,9 @@ def refresh_character_shops():
                 items.delete()
                 lvl = character.level
                 numbers = rand(6, 4) * lvl * 2
-                names = choice(ITEM_TYPES, 6)
-                damages = [randint(0, 10)*lvl if i == 'weapon' else 0 for i in names]
-                items = Item.objects.bulk_create([Item(name=names[i], belongs_to=character, price=numbers[i][0] + numbers[i][1] + numbers[i][2] + numbers[i][3], 
+                types = randint(1, len(ITEM_TYPES) + 1, 6)
+                damages = [randint(0, 10)*lvl if i == 1 else 0 for i in types]
+                items = Item.objects.bulk_create([Item(name=generate_item_name(), type=types[i], belongs_to=character, price=numbers[i][0] + numbers[i][1] + numbers[i][2] + numbers[i][3], 
                                                 damage=damages[i], strength=numbers[i][0], agility=numbers[i][1], vitality=numbers[i][2], luck=numbers[i][3]) for i in range(6)])
 
 @shared_task

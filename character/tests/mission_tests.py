@@ -26,6 +26,8 @@ class MissionTestCase(APITestCase):
         self.view = CharacterViewSet()
         self.view.basename = router.get_default_basename(CharacterViewSet)
         self.view.request = None
+        self.mission_url = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))
+        self.missions_url = self.view.reverse_action("missions", (self.character.pk,))
 
     def test_start_mission(self):
         equip_url = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))
@@ -34,19 +36,18 @@ class MissionTestCase(APITestCase):
         mission = Mission.objects.get(pk=self.mission1.pk)
         self.assertNotEqual(mission.time_started, None)
 
-### TODO: FIX TEST_GET_EXP/CURRENCY, TEST IF MISSION ENDS AFTER X TIME PASSES
-    def test_get_exp_from_mission(self):
-        equip_url = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))
-        response = self.client.get(equip_url)
-        self.assertEqual(self.character.currency, 10)
+    def test_get_resources_from_mission(self):
+        self.mission1.time = '00:00:00'
+        self.mission1.save()
 
+        self.client.get(self.mission_url)
+        self.client.get(self.missions_url)
 
-    def test_get_currency_from_mission(self):
-        equip_url = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))
-        response = self.client.get(equip_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        character = Character.objects.filter(id=self.character.id)[0]
+        self.assertEqual(character.current_exp, 5)
+        self.assertEqual(character.level, 3)
+        self.assertEqual(character.currency, 10)
 
-        self.assertNotEqual(mission.time_started, None)
 
     def test_start_second_mission(self):
         equip_url1 = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))

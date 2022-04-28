@@ -1,7 +1,23 @@
 from django.contrib.auth.models import User
 from django.db import models
+from character.utils import when_mission_ends
+from django.utils import timezone
 
 from numpy import power
+from datetime import datetime
+
+WEAPON = 1
+HELMET = 2
+ARMOR = 3
+NECKLEASE = 4
+LEGGINGS = 5
+ITEM_TYPES = (
+    (WEAPON, 'weapon'),
+    (HELMET, 'helmet'),
+    (ARMOR, 'armor'),
+    (NECKLEASE, 'necklease'),
+    (LEGGINGS, 'leggings'),
+)
 
 # Create your models here.
 class Stats(models.Model):
@@ -26,8 +42,23 @@ class Character(Stats):
     currency = models.IntegerField(null=True, blank=True, default=0)
     level = models.IntegerField(null=True,blank=True,  default=1)
     battle_points = models.IntegerField(null=True, blank=True, default = 0)
-    current_exp = models.IntegerField(null=True, blank=True, default=1)
+    current_exp = models.IntegerField(null=True, blank=True, default=0)
+    last_attacked_at = models.DateTimeField(null=True, blank=True, default=timezone.make_aware(datetime(1000,1,1,1,1,1,1)))
 
+    @property
+    def damage(self):
+        weapon = Item.objects.filter(belongs_to=self, equipped=True, type=WEAPON).first()
+        if weapon is not None:
+            return weapon.damage * (1 + self.strength/10)
+        return 1 + self.strength/10
+
+    @property
+    def health(self):
+        return self.vitality * 2 * (self.level + 1)
+    
+    def calculate_crit(self, enemy):
+        return self.luck * 2.5 / enemy.level
+    
     @property
     def exp_to_next_level(self):
         return power(self.level, 2) - self.current_exp
@@ -65,11 +96,25 @@ class Character(Stats):
         missions = Mission.objects.filter(belongs_to=self)
         return missions
 
+    @property
+    def fight_cooldown(self):
+        seconds_since_attack = timezone.now().timestamp() - self.last_attacked_at.timestamp()
+        return 10*60 - seconds_since_attack
+
+    def level_up_if_possible(self):
+        while self.exp_to_next_level <= 0:
+            self.current_exp = self.exp_to_next_level * -1
+            self.level += 1
+        return self
+    
     def __str__(self):
         return self.nickname
 
 class Item(Stats):
     name = models.CharField(null=True, max_length=10)
+    type = models.PositiveSmallIntegerField(
+        choices=ITEM_TYPES
+    )
     damage = models.IntegerField(blank=True, default=0)
     equipped = models.BooleanField(null=True, blank=True, default=False)
     purchased = models.BooleanField(null=True, blank=True, default=False)
@@ -95,4 +140,12 @@ class Mission(models.Model):
     def has_started(self):
         if self.time_started is not None:
             return True
+        return False
+        
+    @property
+    def has_finished(self):
+        if self.time_started is not None:
+            to_mission_end = when_mission_ends(self)
+            if to_mission_end <= 0:
+                return True
         return False

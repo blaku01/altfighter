@@ -1,9 +1,6 @@
-import datetime
 import random
 
 from django.utils import timezone
-
-from character.models import Mission
 
 first = ["Chelm", "Elm", "El", "Bur", "En", "Eg", "Pem", "Pen", "Edg", "Sud", "Sod", "Hors", "Dur", "Sun", "Nort", "Brad", "Farn", "Barn", "Dart", "Hart", "South", "Shaft", "Blan", "Rock", "Alf", "Wy", "Marl", "Staf", "Wet", "Cas", "Stain", "Whit", "Stap", "Brom", "Wych", "Watch", "Win", "Horn", "Mel", "Cook", "Hurst", "Ald", "Shriv", "Kings", "Clere", "Maiden", "Leather", "Brack","Brain", "Walt", "Prest", "Wen", "Flit", "Ash"]
 doubles = ["Bass", "Chipp", "Sodd", "Sudd", "Ell", "Burr", "Egg", "Emm", "Hamm", "Hann", "Cann", "Camm", "Camb", "Sund", "Pend", "End", "Warr", "Worr", "Hamp", "Roth", "Both", "Sir", "Cir", "Redd", "Wolv", "Mill", "Kett", "Ribb", "Dribb", "Fald", "Skell", "Chedd", "Chill", "Tipp", "Full", "Todd", "Abb", "Booth"]
@@ -63,7 +60,12 @@ def generate_place_name():
     return finished_name
 
 
+def generate_item_name():
+    finished_name = random.choice(first) + random.choice(doubles)
+    return finished_name
+
 
 def when_mission_ends(mission):
     time_left =  mission.time.minute * 60 + mission.time_started.timestamp() - timezone.now().timestamp()
     return time_left
+

@@ -48,8 +48,8 @@ class CharacterTotalStatsTestCase(APITestCase):
 
 
     def test_total_stats(self):
-        Item.objects.create(name='sword', equipped=True, strength=1, agility=2, belongs_to=self.character)
-        Item.objects.create(name='necklase', equipped=True, strength=1, agility=1, luck=3, belongs_to=self.character)
+        Item.objects.create(name='sword', type=1, equipped=True, strength=1, agility=2, belongs_to=self.character)
+        Item.objects.create(name='necklase', type=2, equipped=True, strength=1, agility=1, luck=3, belongs_to=self.character)
         self.character.strength = 1
         self.character.agility = 1
         self.character.vitality = 1

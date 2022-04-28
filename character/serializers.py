@@ -13,7 +13,7 @@ class StatsSerializer(serializers.Serializer):
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Item
-        fields = ['id','name', 'price', 'strength', 'agility', 'vitality', 'luck']
+        fields = ['id','name', 'type', 'price', 'strength', 'agility', 'vitality', 'luck']
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
