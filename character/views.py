@@ -175,7 +175,20 @@ class CharacterViewSet(viewsets.ModelViewSet):
         else:
             raise PermissionDenied({"message":"You don't have permission to access",
                                 "object_id": character.id})
-    
+
+
+    @action(detail=True, url_path='fight', url_name='fight')
+    def suggest_opponent(self, request, pk):
+        player_character = get_object_or_404(Character, pk=pk)
+        #check if its users character
+        if player_character.created_by == request.user:
+            # randomly generate 3 enemies with simillar battle_points
+            characters = Character.objects.filter(battle_points__range=[player_character.battle_points - 100, player_character + 100]).order_by('?')[:3]
+            serialized_characters = CharacterListSerializer(characters, many=True, context={'request': request}).data
+            return Response(serialized_characters, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
     @action(detail=True, url_path='fight/(?P<enemy_pk>[^/.]+)', url_name='fight')
     def fight(self, request, enemy_pk, pk):
         player_character = get_object_or_404(Character, pk=pk)
@@ -185,6 +198,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
         if player_character.created_by == request.user:
             # if character fight is on cooldown, return 403
             if player_character.fight_cooldown is not None:
+                player_character.last_attacked_at = now()
                 player_dmg = player_character.damage
                 player_hp_left = player_character.health
                 player_crit_chance = player_character.calculate_crit(enemy_character)
@@ -203,6 +217,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
                     player_hp_left -= enemy_dmg
                     battle_log.append((enemy_damage_dealt, player_hp_left))
                     if player_hp_left < 0:
+                        player_character.battle_points += 10
                         return Response({'battle_log': battle_log}, status=status.HTTP_200_OK)
 
                     # player attacks
@@ -210,6 +225,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
                         player_damage_dealt *= 2
                     enemy_hp_left -= player_damage_dealt
                     if enemy_hp_left < 0:
+                        player_character.battle_points -= 5
                         return Response({'battle_log': battle_log}, status=status.HTTP_200_OK)
         
 
