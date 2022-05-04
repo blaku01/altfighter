@@ -9,3 +9,4 @@ django-filter
 django-celery-beat
 django-annoying
 numpy
+django-cors-headers

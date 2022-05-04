@@ -1,4 +1,5 @@
 from multiprocessing.sharedctypes import Value
+from os import link
 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -18,6 +19,14 @@ from character.tasks import refresh_character_missions, refresh_character_shops
 from character.utils import when_mission_ends
 import random
 
+class UserCharacterDetailView(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    def list(self, request):
+        queryset = Character.objects.filter(created_by=request.user).first()
+        if queryset:
+            serializer = CharacterSerializer(queryset, context={'request': request})
+            return Response(serializer.data)
+        return Response({})
 
 class CharacterViewSet(viewsets.ModelViewSet):
     """
@@ -33,7 +42,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
             return CharacterListSerializer
         else:
             return CharacterSerializer
-    
+
     @action(detail=True, url_path='shop/(?P<item_pk>[^/.]+)', url_name='purchase_item')
     def purchase_item(self, request, item_pk, pk=None):
         item = get_object_or_404(Item, pk=item_pk)

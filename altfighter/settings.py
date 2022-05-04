@@ -40,13 +40,15 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 
     'django_celery_beat',
-
     'character',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -155,3 +157,8 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://127.0.0.1:6379
 
 
 LOGIN_REDIRECT_URL = '/characters/'
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
