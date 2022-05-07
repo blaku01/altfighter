@@ -33,7 +33,7 @@ class HasChampionAlready(permissions.BasePermission):
             return True
         return False
 
-class IsOwnerObject(permissions.BasePermission):
+class IsObjectOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == 'DELETE' or request.method == 'PUT':
             return obj.created_by == request.user

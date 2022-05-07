@@ -6,10 +6,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.routers import SimpleRouter
 from character.models import Character, Mission
-from character.views import CharacterViewSet
+from character.views import MissionViewSet
 
-router = SimpleRouter()
-router.register(r'characters', CharacterViewSet)
 class MissionTestCase(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(username='user1',
@@ -23,15 +21,14 @@ class MissionTestCase(APITestCase):
         self.mission2 = Mission.objects.create(name='mission1', exp=15, currency=15, time='00:15:00', belongs_to=self.character)
         self.mission3 = Mission.objects.create(name='mission1', exp=20, currency=20, time='00:20:00', belongs_to=self.character)
 
-        self.view = CharacterViewSet()
-        self.view.basename = router.get_default_basename(CharacterViewSet)
+        self.view = MissionViewSet()
         self.view.request = None
-        self.mission_url = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))
-        self.missions_url = self.view.reverse_action("missions", (self.character.pk,))
+        self.mission_url = reverse('missions-update')
+        self.missions_url = reverse('missions-list')
 
     def test_start_mission(self):
-        equip_url = self.view.reverse_action("start_mission", (self.character.pk, self.mission1.id))
-        response = self.client.get(equip_url)
+        print(self.mission_url)
+        response = self.client.get(self.mission_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         mission = Mission.objects.get(pk=self.mission1.pk)
         self.assertNotEqual(mission.time_started, None)

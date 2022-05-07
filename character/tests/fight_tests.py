@@ -2,12 +2,11 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.routers import SimpleRouter
+from django.urls import reverse
 from character.models import Character, Mission
-from character.views import CharacterViewSet
+from character.views import ArenaViewSet
 from rest_framework import status
 
-router = SimpleRouter()
-router.register(r'characters', CharacterViewSet)
 class MissionTestCase(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(username='user1',
@@ -22,24 +21,18 @@ class MissionTestCase(APITestCase):
 
         self.character2 = Character.objects.create(nickname='character2', created_by=self.user2)
 
-        self.view = CharacterViewSet()
-        self.view.basename = router.get_default_basename(CharacterViewSet)
-        self.view.request = None
-        self.fighting_url = self.view.reverse_action("fight", (self.character1.pk, self.character2.pk))
+        self.fighting_url = reverse('arena-fight',  args=(self.character2.pk,))
 
     def test_start_fight(self):
-        response = self.client.get(self.fighting_url)
+        response = self.client.post(self.fighting_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_fight_cooldown(self):
-        self.client.get(self.fighting_url)
-        self.assertLess(self.character1.fight_cooldown, 0)
+        self.client.post(self.fighting_url)
+        character = Character.objects.filter(pk=self.character1.pk).first() # self.character1 is not updating after fight()
+        self.assertLess(character.fight_cooldown, 0)
 
     def test_get_battle_points(self):
-        self.client.get(self.fighting_url)
-        self.assertNotEqual(self.character1.battle_points, 1)
-
-    def test_start_others_fight(self):
-        others_fighting_url = self.view.reverse_action("fight", (self.character2.pk, self.character1.pk))
-        response = self.client.get(others_fighting_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.client.post(self.fighting_url)
+        character = Character.objects.filter(pk=self.character1.pk).first()
+        self.assertNotEqual(character.battle_points, 0)

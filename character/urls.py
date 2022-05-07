@@ -5,11 +5,10 @@ from character import views
 
 router = routers.SimpleRouter()
 
-router.register(r'user-character', views.UserCharacterDetailView, basename='user-character')
 router.register(r'characters', views.CharacterViewSet)
 router.register(r'users', views.UserViewSet)
-router.register(r'items', views.ItemViewSet)
-
+router.register(r'missions', views.MissionViewSet, basename='missions')
+router.register(r'arena', views.ArenaViewSet, basename='arena')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

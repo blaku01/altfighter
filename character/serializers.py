@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from character.models import Character, Item, Mission
-from character.utils import when_mission_ends
+from character.models import Character, Mission
+from item.models import Item
+from item.serializers import ItemSerializer
 
 class StatsSerializer(serializers.Serializer):
     strength=serializers.IntegerField(min_value=0)
@@ -10,11 +11,6 @@ class StatsSerializer(serializers.Serializer):
     vitality=serializers.IntegerField(min_value=0)
     luck=serializers.IntegerField(min_value=0)
     
-class ItemSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Item
-        fields = ['id','name', 'type', 'price', 'strength', 'agility', 'vitality', 'luck']
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
@@ -28,13 +24,10 @@ class MissionSerializer(serializers.HyperlinkedModelSerializer):
 
 class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     total_stats = StatsSerializer(read_only=True)
-    shop = ItemSerializer(many=True, read_only=True)
     equipped_items = ItemSerializer(many=True, read_only=True)
-    backpack = ItemSerializer(many=True, read_only=True)
-    missions = MissionSerializer(many=True, read_only=True)
     class Meta:
         model = Character
-        fields = ['url', 'nickname', 'level', 'current_exp', 'currency', 'strength', 'agility', 'vitality', 'luck', 'total_stats', 'equipped_items', 'backpack', 'shop', 'missions']
+        fields = ['url', 'nickname', 'level', 'current_exp', 'currency', 'strength', 'agility', 'vitality', 'luck', 'total_stats', 'equipped_items']
         read_only_fields = ('level', 'battle_points', 'current_exp')
         # extra_kwargs = {'created_by': {'default': serializers.CurrentUserDefault()}} #doesnt work after changing created_by to OneToOneField
         depth = 0
@@ -44,16 +37,7 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_equipped_items(self, obj):
         return obj.equipped_items
-    
-    def get_backpack(self, obj):
-        return obj.backpack
-    
-    def get_shop(self, obj):
-        return obj.shop
-    
-    def get_missions(self, obj):
-        return obj.missions
-    
+
     def to_representation(self, instance):
         representation =  super().to_representation(instance)
         representation['base_stats'] = {}

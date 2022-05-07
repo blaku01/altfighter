@@ -7,7 +7,8 @@ from django.db import connection
 from numpy import ones
 from numpy.random import choice, rand, randint
 
-from character.models import Character, Item, Mission, ITEM_TYPES
+from character.models import Character, Mission
+from item.models import ITEM_TYPES, Item
 from character.utils import generate_place_name, generate_item_name
 
 @shared_task

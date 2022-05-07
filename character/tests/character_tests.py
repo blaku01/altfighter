@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from character.serializers import CharacterListSerializer, CharacterSerializer
-from character.models import Character, Item
+from character.models import Character
+from item.models import Item
 
 
 class CharacterCreateTestCase(APITestCase):
@@ -28,12 +28,6 @@ class CharacterCreateTestCase(APITestCase):
         self.client.force_authenticate(user=None)
         response = self.client.post(self.character_create_url, {"nickname":"character"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_create_second_character(self):
-        self.client.post(self.character_create_url, {"nickname":"character1"})
-        response = self.client.post(self.character_create_url, {"nickname":"character2"})
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
 class CharacterTotalStatsTestCase(APITestCase):
 

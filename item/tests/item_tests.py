@@ -9,8 +9,7 @@ from rest_framework.routers import SimpleRouter
 from character.models import Character, Item
 from character.views import CharacterViewSet
 
-router = SimpleRouter()
-router.register(r'characters', CharacterViewSet)
+
 class EquipTestCase(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(username='user1',
@@ -22,16 +21,13 @@ class EquipTestCase(APITestCase):
 
         self.item1 = Item.objects.create(name='sword', type=1, strength=1, agility=2, belongs_to=self.character)
 
-        self.view = CharacterViewSet()
-        self.view.basename = router.get_default_basename(CharacterViewSet)
-        self.view.request = None
+        self.equip_url = reverse("backpack-equip", args=(self.item1.pk,))
 
     def test_equip_item(self):
         self.item1.equipped = False
         self.item1.purchased = True
         self.item1.save()
-        equip_url = self.view.reverse_action("equip_item", (self.character.pk, self.item1.id))
-        response = self.client.get(equip_url)
+        response = self.client.get(self.equip_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         item = Item.objects.get(pk=self.item1.pk)
         self.assertEqual(item.equipped, True)
@@ -41,8 +37,7 @@ class EquipTestCase(APITestCase):
         self.item1.equipped = True
         self.item1.save()
 
-        equip_url = self.view.reverse_action("equip_item", (self.character.pk, self.item1.id))
-        response = self.client.get(equip_url)
+        response = self.client.get(self.equip_url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -52,9 +47,7 @@ class EquipTestCase(APITestCase):
         self.item1.equipped = False
         self.item1.save()
 
-
-        equip_url = self.view.reverse_action("equip_item", (self.character.pk, self.item1.id))
-        response = self.client.get(equip_url)
+        response = self.client.get(self.equip_url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         item = Item.objects.get(pk=self.item1.pk)
@@ -74,9 +67,7 @@ class PurchaseTestCase(APITestCase):
 
         self.item1 = Item.objects.create(name='sword', type=1, strength=1, agility=2, belongs_to=self.character, price=10)
 
-        self.view = CharacterViewSet()
-        self.view.basename = router.get_default_basename(CharacterViewSet)
-        self.view.request = None
+        self.equip_url = reverse("shop-purchase", args=(self.item1.pk,))
 
 
     def test_purchase_item(self):
@@ -86,8 +77,7 @@ class PurchaseTestCase(APITestCase):
         self.character.currency = 20
         self.character.save()
 
-        equip_url = self.view.reverse_action("purchase_item", (self.character.pk, self.item1.id))
-        response = self.client.get(equip_url)
+        response = self.client.get(self.equip_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         item = Item.objects.get(pk=self.item1.pk)
@@ -101,8 +91,7 @@ class PurchaseTestCase(APITestCase):
         self.character.currency = 0
         self.character.save()
 
-        equip_url = self.view.reverse_action("purchase_item", (self.character.pk, self.item1.id))
-        response = self.client.get(equip_url)
+        response = self.client.get(self.equip_url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         item = Item.objects.get(pk=self.item1.pk)
@@ -115,8 +104,8 @@ class PurchaseTestCase(APITestCase):
         self.character.currency = 20
         self.character.save()
 
-        equip_url = self.view.reverse_action("purchase_item", (self.character.pk, self.item1.id))
-        response = self.client.get(equip_url)
+        response = self.client.get(self.equip_url)
+
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
