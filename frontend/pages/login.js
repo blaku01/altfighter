@@ -15,6 +15,7 @@ function Login(res, req) {
                 'Content-Type': 'application/json',
             },
         })
+        console.log(response.status)
         if (response.status == 200) {
             router.push('/')
         }
@@ -25,8 +26,8 @@ function Login(res, req) {
     }
     return (
 
-        <div className="w-full max-w-xs fixed">
-            <form className="bg-transparent	 shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div className={`h-full w-full flex items-center justify-center`} style={{ zIndex: 1 }}>
+            <form className="self-center bg-transparent	 shadow-md rounded">
                 {areCredentialsWrong ? <p className="text-center text-red-300 text-xl italic ">Wrong credentials!</p> : <></>}
                 <div className="mb-4">
                     <label className="block text-white text-sm font-bold mb-2" htmlFor="username">

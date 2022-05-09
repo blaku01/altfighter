@@ -16,12 +16,13 @@ function Shop(res, req) {
   if (isLoading) return <p>Loading...</p>
   if (!data) return <p>No profile data</p>
   return (
-
-    <div className="w-full max-w-xs fixed">
-      <ul>{data.shop.map((item, index) => {
-        return <li>{item.id} {item.name} {item.price}</li>
-      })}
-      </ul>
+    <div className={`h-full w-full flex items-center justify-center`} style={{ zIndex: 1 }}>
+      <div className="self-center flex bg-transparent	 shadow rounded">
+        <ul>{data.shop.map((item, index) => {
+          return <li>{item.id} {item.name} {item.price}</li>
+        })}
+        </ul>
+      </div>
     </div>
   )
 }

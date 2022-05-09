@@ -10,13 +10,15 @@ from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.views import Response
 
 from character.models import Character, Item, Mission
-from character.permissions import (DisallowPatch, DisallowPut, HasChampionAlready, IsObjectOwner)
+from character.permissions import (
+    DisallowPatch, DisallowPut, HasChampionAlready, IsObjectOwner)
 from character.serializers import (CharacterListSerializer,
                                    CharacterSerializer, ItemSerializer,
                                    MissionSerializer, UserSerializer)
 from character.tasks import refresh_character_missions, refresh_character_shops
 from character.utils import when_mission_ends
 import random
+
 
 class MissionViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -25,7 +27,7 @@ class MissionViewSet(viewsets.ViewSet):
     def list(self, request):
         character = get_object_or_404(Character, created_by=request.user)
         refresh_character_shops.delay()
-        #check if any of character missions has ended
+        # check if any of character missions has ended
         mission_ended = False
         for mission in character.missions:
             if mission.time_started is not None:
@@ -34,7 +36,8 @@ class MissionViewSet(viewsets.ViewSet):
                     break
                 # if mission has started - return only this mission
                 if mission.has_started:
-                    serialized_mission = MissionSerializer(mission, many=False, context={'request':request}).data
+                    serialized_mission = MissionSerializer(
+                        mission, many=False, context={'request': request}).data
                     return Response(serialized_mission, status=status.HTTP_200_OK)
         # if mission has finished grant character resources from it
         if mission_ended:
@@ -48,30 +51,34 @@ class MissionViewSet(viewsets.ViewSet):
             refresh_character_missions(character)
 
         missions = character.missions
-        serialized_missions = MissionSerializer(missions, many=True, context={'request': request}).data
+        serialized_missions = MissionSerializer(
+            missions, many=True, context={'request': request}).data
         return Response(serialized_missions, status=status.HTTP_200_OK)
 
     # take mission
     @action(detail=True, methods=['post'], url_path='/(?P<mission_pk>[^/.]+)', url_name='start_mission')
     def start_mission(self, request, mission_pk):
-        user_character = get_object_or_404(Character, created_by=user_character)
+        user_character = get_object_or_404(
+            Character, created_by=user_character)
         user_missions = Mission.objects.filter(belongs_to=user_character)
         mission = user_missions.filter(pk=mission_pk).first()
         # check if user started another mission
         for user_mission in user_missions:
             if user_mission.has_started:
                 return Response({'status': 'You already started a mission'}, status=status.HTTP_403_FORBIDDEN)
-        #start and return mission
+        # start and return mission
         mission.time_started = now()
         mission.save()
-        serialized_mission = MissionSerializer(mission, context={'request': request}).data
+        serialized_mission = MissionSerializer(
+            mission, context={'request': request}).data
         return Response(serialized_mission, status=status.HTTP_200_OK)
 
     # if mission has started - cancel it
     @action(detail=True, methods=['post', 'delete'], url_path='/(?P<mission_pk>[^/.]+)', url_name='cancel_mission')
     def cancel_mission(self, request, mission_pk):
         user_character = get_object_or_404(Character, created_by=request.user)
-        user_mission = get_object_or_404(Mission, belongs_to=user_character, pk=mission_pk)
+        user_mission = get_object_or_404(
+            Mission, belongs_to=user_character, pk=mission_pk)
         if not user_mission.has_started:
             return Response({'status': 'You need to start mission first'}, status=status.HTTP_403_FORBIDDEN)
         user_mission.time_started = None
@@ -79,20 +86,22 @@ class MissionViewSet(viewsets.ViewSet):
         return Response({'status': 'Successfully canceled mission'}, status=status.HTTP_200_OK)
 
 
-
-
 class ArenaViewSet(viewsets.ViewSet):
     def list(self, request):
-        player_character = get_object_or_404(Character, created_by=request.user)
-        #check if its users character
+        player_character = get_object_or_404(
+            Character, created_by=request.user)
+        # check if its users character
         # randomly generate 3 enemies with simillar battle_points
-        characters = Character.objects.filter(battle_points__range=[player_character.battle_points - 100, player_character + 100]).order_by('?')[:3]
-        serialized_characters = CharacterListSerializer(characters, many=True, context={'request': request}).data
+        characters = Character.objects.filter(battle_points__range=[
+                                              player_character.battle_points - 100, player_character + 100]).order_by('?')[:3]
+        serialized_characters = CharacterListSerializer(
+            characters, many=True, context={'request': request}).data
         return Response(serialized_characters, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post', 'get', 'put'], url_path='/(?P<enemy_pk>[^/.]+)', url_name='fight')
     def fight(self, request, enemy_pk):
-        player_character = get_object_or_404(Character, created_by=request.user)
+        player_character = get_object_or_404(
+            Character, created_by=request.user)
         enemy_character = get_object_or_404(Character, pk=enemy_pk)
 
         # if character fight is on cooldown, return 403
@@ -149,9 +158,10 @@ class CharacterViewSet(viewsets.ModelViewSet):
     def get_user_character(self, request):
         refresh_character_shops.delay()
         user_character = get_object_or_404(Character, created_by=request.user)
-        serialized_character = CharacterSerializer(user_character, context={'request': request}).data
+        serialized_character = CharacterSerializer(
+            user_character, context={'request': request}).data
         return Response(serialized_character, status=status.HTTP_200_OK)
-                                                                                          
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """

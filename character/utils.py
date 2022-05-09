@@ -2,19 +2,24 @@ import random
 
 from django.utils import timezone
 
-first = ["Chelm", "Elm", "El", "Bur", "En", "Eg", "Pem", "Pen", "Edg", "Sud", "Sod", "Hors", "Dur", "Sun", "Nort", "Brad", "Farn", "Barn", "Dart", "Hart", "South", "Shaft", "Blan", "Rock", "Alf", "Wy", "Marl", "Staf", "Wet", "Cas", "Stain", "Whit", "Stap", "Brom", "Wych", "Watch", "Win", "Horn", "Mel", "Cook", "Hurst", "Ald", "Shriv", "Kings", "Clere", "Maiden", "Leather", "Brack","Brain", "Walt", "Prest", "Wen", "Flit", "Ash"]
-doubles = ["Bass", "Chipp", "Sodd", "Sudd", "Ell", "Burr", "Egg", "Emm", "Hamm", "Hann", "Cann", "Camm", "Camb", "Sund", "Pend", "End", "Warr", "Worr", "Hamp", "Roth", "Both", "Sir", "Cir", "Redd", "Wolv", "Mill", "Kett", "Ribb", "Dribb", "Fald", "Skell", "Chedd", "Chill", "Tipp", "Full", "Todd", "Abb", "Booth"]
+first = ["Chelm", "Elm", "El", "Bur", "En", "Eg", "Pem", "Pen", "Edg", "Sud", "Sod", "Hors", "Dur", "Sun", "Nort", "Brad", "Farn", "Barn", "Dart", "Hart", "South", "Shaft", "Blan", "Rock", "Alf", "Wy", "Marl", "Staf",
+         "Wet", "Cas", "Stain", "Whit", "Stap", "Brom", "Wych", "Watch", "Win", "Horn", "Mel", "Cook", "Hurst", "Ald", "Shriv", "Kings", "Clere", "Maiden", "Leather", "Brack", "Brain", "Walt", "Prest", "Wen", "Flit", "Ash"]
+doubles = ["Bass", "Chipp", "Sodd", "Sudd", "Ell", "Burr", "Egg", "Emm", "Hamm", "Hann", "Cann", "Camm", "Camb", "Sund", "Pend", "End", "Warr", "Worr", "Hamp",
+           "Roth", "Both", "Sir", "Cir", "Redd", "Wolv", "Mill", "Kett", "Ribb", "Dribb", "Fald", "Skell", "Chedd", "Chill", "Tipp", "Full", "Todd", "Abb", "Booth"]
 postdoubles = ["ing", "en", "er"]
-mid = ["bas", "ber", "stan", "ring", "den", "-under-", " on ", "en", "re", "rens", "comp", "mer", "sey", "mans"]
-last = ["ford", "stoke", "ley", "ney",  "don", "den", "ton", "bury", "well", "beck", "ham", "borough", "side", "wick", "hampton", "wich", "cester", "chester", "ling", "moor", "wood", "brook", "port", "wold", "mere", "castle", "hall", "bridge", "combe", "smith", "field", "ditch", "wang", "over", "worth", "by", "brough", "low", "grove", "avon", "sted", "bourne", "borne", "thorne", "lake", "shot", "bage", "head", "ey", "nell", "tree", "down"]
+mid = ["bas", "ber", "stan", "ring", "den", "-under-",
+       " on ", "en", "re", "rens", "comp", "mer", "sey", "mans"]
+last = ["ford", "stoke", "ley", "ney",  "don", "den", "ton", "bury", "well", "beck", "ham", "borough", "side", "wick", "hampton", "wich", "cester", "chester", "ling", "moor", "wood", "brook", "port", "wold", "mere", "castle",
+        "hall", "bridge", "combe", "smith", "field", "ditch", "wang", "over", "worth", "by", "brough", "low", "grove", "avon", "sted", "bourne", "borne", "thorne", "lake", "shot", "bage", "head", "ey", "nell", "tree", "down"]
+
 
 def generate_place_name():
     # code from: https://www.reddit.com/r/proceduralgeneration/comments/4ra0cz/english_place_name_generator_in_python/
     finished_name = ""
     pd = 0
-    if(random.random()  > 0.4):
+    if(random.random() > 0.4):
         finished_name = finished_name + random.choice(doubles)
-        if(random.random()  > 0.6):
+        if(random.random() > 0.6):
             finished_name = finished_name + random.choice(postdoubles)
             pd = 1
         else:
@@ -22,9 +27,9 @@ def generate_place_name():
     else:
         finished_name = finished_name + random.choice(first)
 
-    if(random.random()  > 0.5 and not pd):
+    if(random.random() > 0.5 and not pd):
         if(finished_name.endswith("r") or finished_name.endswith("b")):
-            if(random.random()  > 0.4):
+            if(random.random() > 0.4):
                 finished_name = finished_name + "ble"
             else:
                 finished_name = finished_name + "gle"
@@ -33,19 +38,19 @@ def generate_place_name():
         elif(finished_name.endswith("s")):
             finished_name = finished_name + "tle"
 
-    if(random.random()  > 0.7 and finished_name.endswith("le")):
+    if(random.random() > 0.7 and finished_name.endswith("le")):
         finished_name = finished_name + "s"
 
-    elif(random.random()  > 0.5):
+    elif(random.random() > 0.5):
         if(finished_name.endswith("n")):
-            if(random.random()  > 0.5):
+            if(random.random() > 0.5):
                 finished_name = finished_name + "s"
             else:
                 finished_name = finished_name + "d"
         elif(finished_name.endswith("m")):
             finished_name = finished_name + "s"
 
-    if(random.random()  > 0.7):
+    if(random.random() > 0.7):
         finished_name = finished_name + random.choice(mid)
     finished_name = finished_name + random.choice(last)
 
@@ -58,14 +63,10 @@ def generate_place_name():
         finished_name = fix[0] + '-' + fix[2].capitalize()
 
     return finished_name
-
-
 def generate_item_name():
     finished_name = random.choice(first) + random.choice(doubles)
     return finished_name
-
-
 def when_mission_ends(mission):
-    time_left =  mission.time.minute * 60 + mission.time_started.timestamp() - timezone.now().timestamp()
+    time_left = mission.time.minute * 60 + mission.time_started.timestamp() - \
+        timezone.now().timestamp()
     return time_left
-

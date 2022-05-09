@@ -18,14 +18,15 @@ class ShopViewSet(viewsets.ViewSet):
     def list(self, request):
         character = get_object_or_404(Character, created_by=request.user)
         shop = character.shop
-        serialized_item = ItemSerializer(shop, many=True, context={'request': request}).data
+        serialized_item = ItemSerializer(shop, many=True, context={
+                                         'request': request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     # buy an item
     @action(detail=False, methods=['post', 'get', 'put'], url_path='/(?P<item_pk>[^/.]+)', url_name='purchase')
     def purchase(self, request, item_pk):
         character = get_object_or_404(Character, created_by=request.user)
-        item = get_object_or_404(Item, pk=item_pk, belongs_to=character)        
+        item = get_object_or_404(Item, pk=item_pk, belongs_to=character)
         if item.belongs_to.currency < item.price:
             return Response({'status': 'you dont have enough currency to purchase this item!'}, status=status.HTTP_403_FORBIDDEN)
         if len(item.belongs_to.backpack) > 5:
@@ -35,7 +36,8 @@ class ShopViewSet(viewsets.ViewSet):
         item.purchased = True
         item.belongs_to.currency -= item.price
         item.save()
-        serialized_item = ItemSerializer(item, context={'request': request}).data
+        serialized_item = ItemSerializer(
+            item, context={'request': request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
 
@@ -43,7 +45,8 @@ class BackpackViewSet(viewsets.ViewSet):
     def list(self, request):
         character = get_object_or_404(Character, created_by=request.user)
         backpack = character.backpack
-        serialized_item = ItemSerializer(backpack, many=True, context={'request': request}).data
+        serialized_item = ItemSerializer(backpack, many=True, context={
+                                         'request': request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post', 'get', 'put'], url_path='/(?P<item_pk>[^/.]+)', url_name='equip')
@@ -57,17 +60,20 @@ class BackpackViewSet(viewsets.ViewSet):
         # if item2 of the same type as item1 is equipped - unequip the item2 and equip item1
         if item.type in [item.type for item in item.belongs_to.equipped_items]:
             char = Character.objects.filter(created_by=request.user).first()
-            item_eq = Item.objects.filter(belongs_to=char, equipped=True, name=item.name).first()
+            item_eq = Item.objects.filter(
+                belongs_to=char, equipped=True, name=item.name).first()
             item_eq.equipped = False
             item_eq.save()
             item.equipped = True
             item.save()
-            serialized_item = ItemSerializer(item, context={'request': request}).data
+            serialized_item = ItemSerializer(
+                item, context={'request': request}).data
             return Response(serialized_item, status=status.HTTP_200_OK)
-        #equip item
+        # equip item
         item.equipped = True
         item.save()
-        serialized_item = ItemSerializer(item, context={'request': request}).data
+        serialized_item = ItemSerializer(
+            item, context={'request': request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     # sell item!

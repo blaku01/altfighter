@@ -7,13 +7,16 @@ HELMET = 2
 ARMOR = 3
 NECKLEASE = 4
 LEGGINGS = 5
+SHIELD= 6
 ITEM_TYPES = (
     (WEAPON, 'weapon'),
     (HELMET, 'helmet'),
     (ARMOR, 'armor'),
     (NECKLEASE, 'necklease'),
     (LEGGINGS, 'leggings'),
+    (SHIELD, 'shield')
 )
+
 
 class Item(Stats):
     name = models.CharField(null=True, max_length=10)
@@ -21,10 +24,12 @@ class Item(Stats):
         choices=ITEM_TYPES
     )
     damage = models.IntegerField(blank=True, default=0)
+    block_chance = models.IntegerField(blank=True, null=True)
     equipped = models.BooleanField(null=True, blank=True, default=False)
     purchased = models.BooleanField(null=True, blank=True, default=False)
     price = models.IntegerField(null=True)
-    belongs_to = models.ForeignKey('character.Character', on_delete=models.CASCADE)
+    belongs_to = models.ForeignKey(
+        'character.Character', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
