@@ -147,6 +147,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, url_path='user_character', url_name='user_character')
     def get_user_character(self, request):
+        refresh_character_shops.delay()
         user_character = get_object_or_404(Character, created_by=request.user)
         serialized_character = CharacterSerializer(user_character, context={'request': request}).data
         return Response(serialized_character, status=status.HTTP_200_OK)
