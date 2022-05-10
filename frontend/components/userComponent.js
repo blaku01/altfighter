@@ -6,7 +6,7 @@ import useSWR from 'swr'
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 
-function Navbar() {
+function UserComponent() {
     console.log('fetching...')
     const router = useRouter()
     const { data, error } = useSWR('/api/user_character', fetcher)
@@ -17,28 +17,39 @@ function Navbar() {
     }
     if (!data) return <div>Loading...</div>
     return (
-        <div className="w-fit h-[90vh] my-[5vh] bg-black/50 rounded-[5px] flex flex-col " style={{ zIndex: 1 }}>
+        <div className="w-[45vw] h-[90vh] my-[5vh] flex items-center justify-center border" style={{ zIndex: 1 }}>
             {/* user info */}
-            <div className="self-center flex w-[90%] items-center">
-                <div className=" sm:flex flex-col text-white/80   space-y-0 hidden ">
-                    <div className=" text-center font-[700]">{data.character.nickname}</div>
-                    <progress className="h-[5px] w-8em" max="100" value={(data.character.current_exp / Math.pow(data.character.level, 3) * 100)}></progress>
-                    <div className="text-center">level {data.character.level}</div>
+            <div className="self-center border flex flex-col w-[90%] h-[100%] items-center justify-center">
+                <div className="w-[100%] h-[60%] flex border ">
+                    <div className="w-[25%] h-full flex flex-col items-center border">
+                        <div className="w-[90%] h-[30%] border"></div>
+                        <div className="w-[90%] h-[30%] border"></div>
+                        <div className="w-[90%] h-[30%] border"></div>
+                    </div>
+                    <div className="w-[50%] h-full flex flex-col items-center border">
+                        <div className="w-[80%] h-[60%] border"></div>
+                        <div className="w-[80%] h-[40%] flex items-center border">
+                            <div className="w-[50%] h-[70%] border"></div>
+                            <div className="w-[50%] h-[70%] border"></div>
+                        </div>
+                    </div>
+                    <div className="w-[25%] h-full flex flex-col items-center border">
+                        <div className="w-[90%] h-[30%] border"></div>
+                        <div className="w-[90%] h-[30%] border"></div>
+                        <div className="w-[90%] h-[30%] border"></div>
+                    </div>
+                </div>
+                <div className="w-[100%] h-[40%] flex flex-wrap items-center justify-center border">
+                    <div className="w-[25%] h-[40%] mx-[3%] border"></div>
+                    <div className="w-[25%] h-[40%] mx-[3%] border"></div>
+                    <div className="w-[25%] h-[40%] mx-[3%] border"></div>
+                    <div className="w-[25%] h-[40%] mx-[3%] border"></div>
+                    <div className="w-[25%] h-[40%] mx-[3%] border"></div>
+                    <div className="w-[25%] h-[40%] mx-[3%] border"></div>
                 </div>
             </div>
-            <hr className="text-gray-900 border-1 w-[100%]" />
-
-            {/* Links */}
-            <ul className="mt-2 flex flex-col h-[100%]">
-                <NavbarItem action='fight' />
-                <NavbarItem action='missions' />
-                <NavbarItem action='shop' />
-                <NavbarItem action='leaderboard' />
-                <NavbarItem action='logout' is_icon={false} />
-            </ul>
-
         </div>
     )
 }
 
-export default Navbar;
+export default UserComponent;

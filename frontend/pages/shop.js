@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import UserComponent from '../components/userComponent'
 
 function Shop(res, req) {
   const [data, setData] = useState(null)
@@ -16,14 +16,22 @@ function Shop(res, req) {
   if (isLoading) return <p>Loading...</p>
   if (!data) return <p>No profile data</p>
   return (
-    <div className={`h-full w-full flex items-center justify-center`} style={{ zIndex: 1 }}>
-      <div className="self-center flex bg-transparent	 shadow rounded">
-        <ul>{data.shop.map((item, index) => {
-          return <li>{item.id} {item.name} {item.price}</li>
-        })}
-        </ul>
+    <>
+      <UserComponent />
+      <div className={`h-[90%] w-[45vw] my-[5vh] flex items-center justify-center border`} style={{ zIndex: 1 }}>
+        <div className='h-full w-[90%] flex flex-col border'>
+          <div className='h-[60%] w-full border'></div>
+          <div className='h-[40%] w-full flex flex-wrap items-center justify-center  border'>
+            {data.shop.map((item, index) => {
+              return(
+              <div className="w-[25%] h-[40%] mx-[3%] border">
+                {item.id} {item.name} {item.price}
+              </div>
+            )})}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

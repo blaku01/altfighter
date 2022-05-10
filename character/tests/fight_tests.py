@@ -7,19 +7,22 @@ from character.models import Character, Mission
 from character.views import ArenaViewSet
 from rest_framework import status
 
-class MissionTestCase(APITestCase):
+
+class FightTestCase(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(username='user1',
-                                            password='password')
+                                              password='password')
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
         self.user2 = User.objects.create_user(username='user2',
-                                            password='password')
+                                              password='password')
 
-        self.character1 = Character.objects.create(nickname='character1', strength=200, agility=200, vitality=200, luck=200, created_by=self.user1)
+        self.character1 = Character.objects.create(
+            nickname='character1', strength=200, agility=200, vitality=200, luck=200, created_by=self.user1)
 
-        self.character2 = Character.objects.create(nickname='character2', created_by=self.user2)
+        self.character2 = Character.objects.create(
+            nickname='character2', created_by=self.user2)
 
         self.fighting_url = reverse('arena-fight',  args=(self.character2.pk,))
 
@@ -29,7 +32,8 @@ class MissionTestCase(APITestCase):
 
     def test_fight_cooldown(self):
         self.client.post(self.fighting_url)
-        character = Character.objects.filter(pk=self.character1.pk).first() # self.character1 is not updating after fight()
+        # self.character1 is not updating after fight()
+        character = Character.objects.filter(pk=self.character1.pk).first()
         self.assertLess(character.fight_cooldown, 0)
 
     def test_get_battle_points(self):
