@@ -7,21 +7,24 @@ function Login(res, req) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [areCredentialsWrong, setareCredentialsWrong] = useState(false)
-    const submitAuth = async () => {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ username, password }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        console.log(response.status)
-        if (response.status == 200) {
-            router.push('/')
-        }
-        else {
-            setareCredentialsWrong(true)
-            return {}
+    const submitAuth = async (e) => {
+        e.preventDefault()
+        if (username && password) {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => response.json())
+            if (response.message == "Login Success!") {
+                window.location.replace("/")
+                return {}
+            }
+            else {
+                setareCredentialsWrong(true)
+                return {}
+            }
         }
     }
     return (
@@ -42,7 +45,7 @@ function Login(res, req) {
                     <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" value={password} onChange={e => { setPassword(e.currentTarget.value); }}></input>
                 </div>
                 <div className="flex items-center justify-between">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={submitAuth}>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" onClick={submitAuth}>
                         Sign In
                     </button>
                     <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
