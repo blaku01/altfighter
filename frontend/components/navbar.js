@@ -7,10 +7,9 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 
 function Navbar() {
-    console.log('fetching...')
     const router = useRouter()
-    const { data, error } = useSWR('/api/user_character', fetcher)
     if (router.pathname == '/login') return <></>
+    const { data, error } = useSWR('/api/user_character', fetcher)
     if (error) {
         router.push('/login')
         return <></>

@@ -24,8 +24,18 @@ function Shop(res, req) {
           <div className='h-[40%] w-full flex flex-wrap items-center justify-center  border'>
             {data.shop.map((item, index) => {
               return(
-              <div className="w-[25%] h-[40%] mx-[3%] border">
-                {item.id} {item.name} {item.price}
+              <div key={index} className={`group w-[25%] h-[40%] mx-[3%] border`}>
+                <div className='relative h-[100%] w-[100%]'>
+
+                <div className={`absolute w-[100%] h-[100%] -top-[100%] flex flex-col items-center justify-center invisible group-hover:visible bg-slate-800	 border`}>
+                    <h3 className='uppercase'>{item.name}</h3>
+                    {item.strength != 0 ?<p>strength: {item.strength}</p>:<></>}
+                    {item.agility != 0 ?<p>agility: {item.agility}</p>:<></>}
+                    {item.vitality != 0 ?<p>vitality: {item.vitality}</p>:<></>}
+                    {item.luck != 0 ?<p>luck: {item.luck}</p>:<></>}
+                    {item.damage != 0 ?<p>damage: {item.damage}</p>:<></>}
+                  </div>
+                </div>
               </div>
             )})}
           </div>
@@ -37,4 +47,3 @@ function Shop(res, req) {
 
 
 export default Shop;
-

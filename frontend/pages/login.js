@@ -8,22 +8,25 @@ function Login(res, req) {
     const [password, setPassword] = useState('')
     const [areCredentialsWrong, setareCredentialsWrong] = useState(false)
     const submitAuth = async () => {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ username, password }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        console.log(response.status)
-        if (response.status == 200) {
-            router.push('/')
+        if(username && password){
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            console.log(response.status)
+            if (response.status == 200) {
+                router.push('/')
+            }
+            else {
+                setareCredentialsWrong(true)
+                return {}
+            }
         }
-        else {
-            setareCredentialsWrong(true)
-            return {}
         }
-    }
+
     return (
 
         <div className={`h-full w-full flex items-center justify-center`} style={{ zIndex: 1 }}>
