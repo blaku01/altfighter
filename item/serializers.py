@@ -6,4 +6,4 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'name', 'type', 'price',
-                  'strength', 'agility', 'vitality', 'luck']
+                  'strength', 'agility', 'vitality', 'luck', 'damage']

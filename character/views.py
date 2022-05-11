@@ -1,7 +1,7 @@
 from multiprocessing.sharedctypes import Value
 from os import link
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from rest_framework import permissions, status, viewsets
@@ -18,6 +18,7 @@ from character.serializers import (CharacterListSerializer,
 from character.tasks import refresh_character_missions, refresh_character_shops
 from character.utils import when_mission_ends
 import random
+from django.http import Http404
 
 
 class MissionViewSet(viewsets.ViewSet):
@@ -157,6 +158,8 @@ class CharacterViewSet(viewsets.ModelViewSet):
     @action(detail=False, url_path='user_character', url_name='user_character')
     def get_user_character(self, request):
         refresh_character_shops.delay()
+        if isinstance(request.user, AnonymousUser):
+            raise Http404
         user_character = get_object_or_404(Character, created_by=request.user)
         serialized_character = CharacterSerializer(
             user_character, context={'request': request}).data
