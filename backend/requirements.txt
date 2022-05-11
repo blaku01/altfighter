@@ -1,0 +1,17 @@
+Django>=4.0,<5.0
+redis
+psycopg2>=2.8
+psycopg2-binary>=2.8
+celery[redis]
+djangorestframework
+markdown       
+django-filter
+django-celery-beat
+django-annoying
+numpy
+django-cors-headers
+drf-yasg
+factory-boy
+django-allauth
+dj-rest-auth
+black

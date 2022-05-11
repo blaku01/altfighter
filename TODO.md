@@ -6,17 +6,20 @@ Project Description
 
 ### Todo
 
-- [ ] fix tests for arena. missions, shops  
-- [ ] rethink actions, register arena, missions, shops ViewSets  
+- [ ] create chat  
+- [ ] create guilds  
+- [ ] fix cront schedule tasks  
+- [ ] implement gambler view - gamble gold  
+- [ ] add character profile picture  
 - [ ] move  missions to another app  
 - [ ] move arena to another app  
+- [ ] implement character create - FRONT  
+- [ ] implement factories for characters, items  
 
 ### In Progress
 
+- [ ] create chat service // separate app - FastAPI  
 
 ### Done ✓
 
-- [✓] move backpack to Items app  
-- [✓] move Item model to Items app  
-- [✓] move shops to Items app  
 
