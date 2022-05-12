@@ -57,25 +57,27 @@ class MissionViewSet(viewsets.ViewSet):
         return Response(serialized_missions, status=status.HTTP_200_OK)
 
     # take mission
-    @action(detail=True, methods=['post'], url_path='/(?P<mission_pk>[^/.]+)', url_name='start_mission')
+    @action(detail=False, methods=['post'], url_path='start_mission/(?P<mission_pk>[^/.]+)', url_name='start_mission')
     def start_mission(self, request, mission_pk):
         user_character = get_object_or_404(
-            Character, created_by=user_character)
+            Character, created_by=request.user)
         user_missions = Mission.objects.filter(belongs_to=user_character)
         mission = user_missions.filter(pk=mission_pk).first()
-        # check if user started another mission
-        for user_mission in user_missions:
-            if user_mission.has_started:
-                return Response({'status': 'You already started a mission'}, status=status.HTTP_403_FORBIDDEN)
-        # start and return mission
-        mission.time_started = now()
-        mission.save()
-        serialized_mission = MissionSerializer(
-            mission, context={'request': request}).data
-        return Response(serialized_mission, status=status.HTTP_200_OK)
+        if mission:
+            # check if user started another mission
+            for user_mission in user_missions:
+                if user_mission.has_started:
+                    return Response({'status': 'You already started a mission'}, status=status.HTTP_403_FORBIDDEN)
+            # start and return mission
+            mission.time_started = now()
+            mission.save()
+            serialized_mission = MissionSerializer(
+                mission, context={'request': request}).data
+            return Response(serialized_mission, status=status.HTTP_200_OK)
+        raise Http404
 
     # if mission has started - cancel it
-    @action(detail=True, methods=['post', 'delete'], url_path='/(?P<mission_pk>[^/.]+)', url_name='cancel_mission')
+    @action(detail=False, methods=['post', 'delete'], url_path='cancel_mission/(?P<mission_pk>[^/.]+)', url_name='cancel_mission')
     def cancel_mission(self, request, mission_pk):
         user_character = get_object_or_404(Character, created_by=request.user)
         user_mission = get_object_or_404(
@@ -99,7 +101,7 @@ class ArenaViewSet(viewsets.ViewSet):
             characters, many=True, context={'request': request}).data
         return Response(serialized_characters, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['post', 'get', 'put'], url_path='/(?P<enemy_pk>[^/.]+)', url_name='fight')
+    @action(detail=False, methods=['post', 'get', 'put'], url_path='(fight/?P<enemy_pk>[^/.]+)', url_name='fight')
     def fight(self, request, enemy_pk):
         player_character = get_object_or_404(
             Character, created_by=request.user)

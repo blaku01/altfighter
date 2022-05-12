@@ -9,7 +9,7 @@ function NavbarItem({action, is_icon=true}) {
         icon = <Image layout='fixed' width={icon_size} height={icon_size} src={`/icons/${action}.png`} className='group-hover:text-white'/>
     }
     return(
-    <Link href={action}>
+    <Link href={`/${action}`}>
     <li className="flex text-white/80 items-center space-x-2  hover:bg-white/10 hover:cursor-pointer w-[90%] mx-auto rounded-[15px] p-2 group relative">
         {icon}
         <span className="text-base group-hover:text-white font-[600] hidden sm:inline">{action}</span>

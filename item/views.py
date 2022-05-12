@@ -23,7 +23,7 @@ class ShopViewSet(viewsets.ViewSet):
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     # buy an item
-    @action(detail=False, methods=['post', 'get', 'put'], url_path='/(?P<item_pk>[^/.]+)', url_name='purchase')
+    @action(detail=False, methods=['post', 'get', 'put'], url_path='purchase/(?P<item_pk>[^/.]+)', url_name='purchase')
     def purchase(self, request, item_pk):
         character = get_object_or_404(Character, created_by=request.user)
         item = get_object_or_404(Item, pk=item_pk, belongs_to=character)
@@ -49,7 +49,7 @@ class BackpackViewSet(viewsets.ViewSet):
                                          'request': request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['post', 'get', 'put'], url_path='/(?P<item_pk>[^/.]+)', url_name='equip')
+    @action(detail=False, methods=['post', 'get', 'put'], url_path='equip/(?P<item_pk>[^/.]+)', url_name='equip')
     def equip(self, request, item_pk):
         character = get_object_or_404(Character, created_by=request.user)
         item = get_object_or_404(Item, pk=item_pk, belongs_to=character)
@@ -77,7 +77,7 @@ class BackpackViewSet(viewsets.ViewSet):
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     # sell item!
-    @action(detail=False, methods=['post', 'get', 'put', 'delete'], url_path='/(?P<item_pk>[^/.]+)', url_name='sell')
+    @action(detail=False, methods=['post', 'get', 'put', 'delete'], url_path='sell/(?P<item_pk>[^/.]+)', url_name='sell')
     def sell(self, request, item_pk):
         character = get_object_or_404(Character, created_by=request.user)
         item = get_object_or_404(Item, pk=item_pk, belongs_to=character)

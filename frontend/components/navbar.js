@@ -15,6 +15,10 @@ function Navbar() {
         return <></>
     }
     if (!data) return <div>Loading...</div>
+    if (data.character.detail == "Not found.") {
+        router.push('/login')
+        return <></>
+    }
     return (
         <div className="w-fit h-[90vh] my-[5vh] bg-black/50 rounded-[5px] flex flex-col " style={{ zIndex: 1 }}>
             {/* user info */}

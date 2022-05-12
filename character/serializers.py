@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django.utils import timezone
 
 from character.models import Character, Mission
 from item.models import Item
 from item.serializers import ItemSerializer
-
+from character.utils import when_mission_ends
 
 class StatsSerializer(serializers.Serializer):
     strength = serializers.IntegerField(min_value=0)
@@ -20,9 +21,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MissionSerializer(serializers.HyperlinkedModelSerializer):
+    total_time = serializers.SerializerMethodField()
     class Meta:
         model = Mission
-        fields = ['id', 'name', 'exp', 'currency', 'time', 'time_started']
+        fields = ['id', 'name', 'exp', 'currency', 'time', 'total_time']
+
+    def get_total_time(self, obj):
+        if obj.time_started == None:
+            return None
+        return int(when_mission_ends(obj))
 
 
 class CharacterSerializer(serializers.HyperlinkedModelSerializer):
