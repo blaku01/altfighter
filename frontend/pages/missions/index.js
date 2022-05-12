@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import MissionsComponent from '/components/missions'
 import SingleMissionComponent from '/components/mission'
-
+import { useRouter } from 'next/router';
 
 function Missions(res, req) {
+  const router = useRouter()
   const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(false)
   useEffect(() => {
@@ -15,13 +16,10 @@ function Missions(res, req) {
         setLoading(false)
       })
   }, [])
-  if (isLoading) return <p>Loading...</p>
-  if (!data) return <p>No profile data</p>
-  console.log(data.missions, Object.keys(data.missions).length)
+  if (isLoading) return <></>
+  if (!data) return <></>
   if (Object.keys(data.missions).length == 6) {
-    return (
-      <SingleMissionComponent mission={data.missions} />
-    )
+      router.push(`/missions/${data.missions.id}`)
   } else {
     return (
       <MissionsComponent missions={data.missions} />
