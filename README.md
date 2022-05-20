@@ -7,7 +7,7 @@ example battle log:
 ![image](https://user-images.githubusercontent.com/55555541/169580528-2f32c10d-4043-4e15-a88b-a14a70b9ba34.png)
 
 ### missions
-![image](https://user-images.githubusercontent.com/55555541/169566429-cdd61a79-eb24-4a64-8b8f-479e93cf1144.png)
+![image](https://user-images.githubusercontent.com/55555541/169581118-dba8925e-2b40-4bdd-8233-a885c64b045a.png)
 
 ### shop
 ![image](https://user-images.githubusercontent.com/55555541/169581046-428f7591-7376-4c79-8263-e73e3c2d9bb8.png)
