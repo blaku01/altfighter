@@ -24,7 +24,7 @@ class Character(Stats):
     created_by = models.OneToOneField(
         User, null=True, on_delete=models.CASCADE)
     type = models.PositiveSmallIntegerField(
-        choices=CHARACTER_CLASSES
+        choices=CHARACTER_CLASSES, null=True
     )
     currency = models.IntegerField(null=True, blank=True, default=0)
     level = models.IntegerField(null=True, blank=True,  default=1)

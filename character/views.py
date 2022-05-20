@@ -101,7 +101,7 @@ class ArenaViewSet(viewsets.ViewSet):
             characters, many=True, context={'request': request}).data
         return Response(serialized_characters, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['post', 'get', 'put'], url_path='(fight/?P<enemy_pk>[^/.]+)', url_name='fight')
+    @action(detail=False, methods=['post', 'get', 'put'], url_path='fight/(?P<enemy_pk>[^/.]+)', url_name='fight')
     def fight(self, request, enemy_pk):
         player_character = get_object_or_404(
             Character, created_by=request.user)
@@ -131,15 +131,18 @@ class ArenaViewSet(viewsets.ViewSet):
             if player_hp_left < 0:
                 player_character.battle_points -= 5
                 player_character.save()
+                print(battle_log)
                 return Response({'battle_log': battle_log}, status=status.HTTP_200_OK)
 
             # player attacks
             if random.random() < player_crit_chance:
                 player_damage_dealt *= 2
             enemy_hp_left -= player_damage_dealt
+            battle_log.append((player_damage_dealt, enemy_hp_left))
             if enemy_hp_left < 0:
                 player_character.battle_points += 10
                 player_character.save()
+                print('\n', battle_log, '\n')
                 return Response({'battle_log': battle_log}, status=status.HTTP_200_OK)
 
 

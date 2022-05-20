@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,6 +161,16 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
 
 LOGIN_REDIRECT_URL = '/characters/'
 
+CELERY_BEAT_SCHEDULE = {
+    "refresh_character_shops": {
+        "task": "character.tasks.refresh_character_shops",
+        "schedule": crontab(minute="*/1"),
+    },
+    "refresh_every_character_missions": {
+        "task": "character.tasks.refresh_every_character_missions",
+        "schedule": crontab(hour="*/1"),
+    },
+}
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
