@@ -22,12 +22,16 @@
 ![image](https://user-images.githubusercontent.com/55555541/169579032-5346e941-485b-4b15-bc76-0f411f3091c2.png)
 
 ## Gameplay
-### fight
-example battle log:
-![image](https://user-images.githubusercontent.com/55555541/169580528-2f32c10d-4043-4e15-a88b-a14a70b9ba34.png)
+
+### user character
+![image](https://user-images.githubusercontent.com/55555541/169652851-5146090c-01b4-482b-8497-c5d16de4c115.png)
 
 ### missions
 ![image](https://user-images.githubusercontent.com/55555541/169581118-dba8925e-2b40-4bdd-8233-a885c64b045a.png)
 
 ### shop
 ![image](https://user-images.githubusercontent.com/55555541/169581046-428f7591-7376-4c79-8263-e73e3c2d9bb8.png)
+
+### fight
+example battle log:
+![image](https://user-images.githubusercontent.com/55555541/169580528-2f32c10d-4043-4e15-a88b-a14a70b9ba34.png)
