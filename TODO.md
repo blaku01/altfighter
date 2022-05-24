@@ -17,7 +17,7 @@ Project Description
 
 ### In Progress
 
-- [ ] fix tests for arena. missions, shops  
+- [ ] create chat service // separate app - FastAPI
 
 ### Done ✓
 
