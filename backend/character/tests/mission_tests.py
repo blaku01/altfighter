@@ -50,4 +50,4 @@ class MissionTestCase(APITestCase):
         response = self.client.post(equip_url2)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         mission = Mission.objects.get(pk=self.mission2.pk)
-        self.assertNotEqual(mission.time_started, None)
+        self.assertEqual(mission.time_started, None)
