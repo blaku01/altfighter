@@ -1,22 +1,17 @@
-<div class="col-md-12">
-    <div class="card card-container">
-      <img
-        id="profile-img"
-        src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-        class="profile-img-card"
-      />
-      <form
+<div class="h-full w-full flex items-center justify-center bg-gray-800">
+  <form
         *ngIf="!isLoggedIn"
         name="form"
         (ngSubmit)="f.form.valid && onSubmit()"
         #f="ngForm"
         novalidate
+        class="self-center bg-transparent	 shadow-md rounded"
       >
-        <div class="form-group">
-          <label for="username">Username</label>
+        <div class="form-group mb-4">
+          <label for="username" class="block text-white text-sm font-bold mb-2">Username</label>
           <input
             type="text"
-            class="form-control"
+            class="form-control shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             name="username"
             [(ngModel)]="form.username"
             required
@@ -30,11 +25,11 @@
             Username is required!
           </div>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
+        <div class="form-group mb-6">
+          <label for="password" class="block text-white text-sm font-bold mb-2">Password</label>
           <input
             type="password"
-            class="form-control"
+            class="form-control shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             name="password"
             [(ngModel)]="form.password"
             required
@@ -52,10 +47,11 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <button class="btn btn-primary btn-block">
+        <div class="form-group flex items-center justify-between">
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Login
           </button>
+          <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#"> Forgot password?</a>
         </div>
         <div class="form-group">
           <div
@@ -68,8 +64,7 @@
         </div>
       </form>
   
-      <div class="alert alert-success" *ngIf="isLoggedIn">
-        Logged in as {{ 'user' }}.
+      <div class="alert alert-success text-white" *ngIf="isLoggedIn">
+        successfully logged in!
       </div>
     </div>
-  </div>
