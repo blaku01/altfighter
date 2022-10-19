@@ -164,7 +164,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
     def get_user_character(self, request):
         refresh_character_shops.delay()
         if isinstance(request.user, AnonymousUser):
-            raise Http404
+            return Response('Unauthorized', status=status.HTTP_401_UNAUTHORIZED)
         user_character = get_object_or_404(Character, created_by=request.user)
         serialized_character = CharacterSerializer(
             user_character, context={'request': request}).data

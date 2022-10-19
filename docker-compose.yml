@@ -6,7 +6,7 @@ services:
         container_name: backend
         env_file:
             - .local.env
-        command: bash -c "python manage.py migrate && python manage.py createsuperuser --noinput && python manage.py runserver 0.0.0.0:8000"
+        command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
         volumes:
             - ./backend:/usr/src/app
         ports:

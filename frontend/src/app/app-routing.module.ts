@@ -13,7 +13,6 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'user', component: BoardUserComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
 
 @NgModule({

@@ -1,42 +1,25 @@
-<div id="app">
-  <nav class="navbar navbar-expand navbar-dark bg-dark">
-    <a href="#" class="navbar-brand">bezKoder</a>
-    <ul class="navbar-nav mr-auto" routerLinkActive="active">
-      <li class="nav-item">
-        <a href="/home" class="nav-link" routerLink="home">Home </a>
-      </li>
-      <li class="nav-item" *ngIf="showAdminBoard">
-        <a href="/admin" class="nav-link" routerLink="admin">Admin Board</a>
-      </li>
-      <li class="nav-item" *ngIf="showModeratorBoard">
-        <a href="/mod" class="nav-link" routerLink="mod">Moderator Board</a>
-      </li>
-      <li class="nav-item">
-        <a href="/user" class="nav-link" *ngIf="isLoggedIn" routerLink="user">User</a>
-      </li>
-    </ul>
+<nav className="mt-2 flex flex-col h-[100%]" *ngFor="let action of ['home', 'login', 'register', 'profile', 'user']">
+  <a routerLink="/{{action}}">
+    <span className="text-base group-hover:text-white font-[600] hidden sm:inline">{{action}}</span>
+  </a>
+</nav>
+<div id="app" *ngIf="character">
+  <div class="w-fit h-[90vh] my-[5vh] bg-black/50 rounded-[5px] flex flex-col">
+    <div class="self-center flex w-[90%] items-center">
+        <div class="w-[100%] sm:flex flex-col items-center justify-center text-white/80   space-y-0 hidden ">
+          <div class=" text-center font-[700]">{{character.nickname}}</div>
+            <div class='w-[80%] h-[100%] m-0 bg-zinc-500'>
+                <div class="h-[5px] bg-green-400" [ngStyle]="{'width': levelPercent}"></div>
+            </div>
+          <div className="text-center">
+            level {{character.level}}
+          </div>
+        </div>
+      </div>
+    <hr className="text-gray-900 border-1 w-[100%]" />
 
-    <ul class="navbar-nav ml-auto" *ngIf="!isLoggedIn">
-      <li class="nav-item">
-        <a href="/register" class="nav-link" routerLink="register">Sign Up</a>
-      </li>
-      <li class="nav-item">
-        <a href="/login" class="nav-link" routerLink="login">Login</a>
-      </li>
-    </ul>
-
-    <ul class="navbar-nav ml-auto" *ngIf="isLoggedIn">
-      <li class="nav-item">
-        <a href="/profile" class="nav-link" routerLink="profile">{{ username }}</a>
-      </li>
-      <li class="nav-item">
-        <a href class="nav-link" (click)="logout()">LogOut</a>
-      </li>
-    </ul>
-  </nav>
-  <button
-  class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-400">Hello</button>
-  <div class="container">
-    <router-outlet></router-outlet>
   </div>
+</div>
+<div class="container">
+  <router-outlet></router-outlet>
 </div>
