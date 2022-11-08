@@ -14,16 +14,12 @@ Project Description
 - [ ] move  missions to another app  
 - [ ] move arena to another app  
 - [ ] implement character create - FRONT  
-- [ ] implement factories for characters, items
+- [ ] implement factories for characters, items  
 
 ### In Progress
 
-- [ ] create chat service // separate app - FastAPI
+- [ ] create chat service // separate app - FastAPI  
 
 ### Done ✓
 
-- [x] rethink actions, register arena, missions, shops ViewSets  
-- [✓] move backpack to Items app  
-- [✓] move Item model to Items app  
-- [✓] move shops to Items app  
 
