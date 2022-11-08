@@ -133,8 +133,6 @@ data
 
 .env
 
-migrations
-
 __pycache__
 
 

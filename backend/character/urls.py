@@ -5,7 +5,7 @@ from character import views
 
 router = routers.SimpleRouter()
 
-router.register(r'characters', views.CharacterViewSet)
+router.register(r'', views.CharacterViewSet)
 router.register(r'missions', views.MissionViewSet, basename='missions')
 router.register(r'arena', views.ArenaViewSet, basename='arena')
 
