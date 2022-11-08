@@ -1,50 +1,26 @@
-version: "3.8"
-   
+version: "3.9"
+
 services:
-    django:
-        build: .
-        container_name: django
-        command: python manage.py runserver 0.0.0.0:8000
+    backend:
+        build:  ./backend
+        container_name: backend
+        env_file:
+            - .local.env
+        command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
         volumes:
-            - ./backend:/usr/src/app/
+            - ./backend:/usr/src/app
         ports:
             - "8000:8000"
-        environment:
-            - POSTGRES_NAME=postgres
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD={DB_PASSWORD}
-        env_file:
-            - .env
         depends_on:
             - pgdb
-            - redis
-    celery:
-        build: .
-        command: celery -A altfighter worker -l INFO
-        volumes:
-            - .:/usr/src/app
-        environment:
-            - POSTGRES_NAME=postgres
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD={DB_PASSWORD}
-        env_file:
-            - .env
-        depends_on:
-            - django
-            - redis
     pgdb:
         image: postgres
         container_name: pgdb
         environment:
-            - POSTGRES_DB=postgres
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD={DB_PASSWORD}
-        volumes:
-            - pgdata:/var/lib/postgresql/data/
+            - POSTGRES_PASSWORD=postgres
+        env_file:
+            - .local.env
     redis:
         image: "redis:alpine"
         ports:
-            - "6379:6379"
-        
-volumes:
-    pgdata:
+            - "6380:6380"

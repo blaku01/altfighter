@@ -41,7 +41,6 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'nickname', 'level', 'current_exp', 'currency', 'strength',
                   'agility', 'vitality', 'luck', 'total_stats', 'equipped_items']
         read_only_fields = ('level', 'battle_points', 'current_exp')
-        # extra_kwargs = {'created_by': {'default': serializers.CurrentUserDefault()}} #doesnt work after changing created_by to OneToOneField
         depth = 0
 
     def get_total_stats(self, obj):
