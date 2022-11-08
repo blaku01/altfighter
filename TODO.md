@@ -14,6 +14,7 @@ Project Description
 - [ ] move  missions to another app  
 - [ ] move arena to another app  
 - [ ] implement character create - FRONT  
+- [ ] implement factories for characters, items
 
 ### In Progress
 

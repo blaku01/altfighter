@@ -6,7 +6,6 @@ from character import views
 router = routers.SimpleRouter()
 
 router.register(r'characters', views.CharacterViewSet)
-router.register(r'users', views.UserViewSet)
 router.register(r'missions', views.MissionViewSet, basename='missions')
 router.register(r'arena', views.ArenaViewSet, basename='arena')
 
@@ -14,5 +13,4 @@ router.register(r'arena', views.ArenaViewSet, basename='arena')
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

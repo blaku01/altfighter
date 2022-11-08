@@ -6,8 +6,6 @@ from character.models import Character, Mission, Item
 class AuthorAdmin(admin.ModelAdmin):
     pass
 
-
-
 @admin.register(Item)
 class AuthorAdmin(admin.ModelAdmin):
     pass

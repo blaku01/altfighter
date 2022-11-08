@@ -1,22 +1,16 @@
-from multiprocessing.sharedctypes import Value
-from os import link
-
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.views import Response
 
-from character.models import Character, Item, Mission
-from character.permissions import (
-    DisallowPatch, DisallowPut, HasChampionAlready, IsObjectOwner)
+from character.models import Character, Mission
+from character.permissions import HasChampionAlready, IsObjectOwner
 from character.serializers import (CharacterListSerializer,
-                                   CharacterSerializer, ItemSerializer,
-                                   MissionSerializer, UserSerializer)
+                                   CharacterSerializer,
+                                   MissionSerializer)
 from character.tasks import refresh_character_missions, refresh_character_shops
-from character.utils import when_mission_ends
 import random
 from django.http import Http404
 
@@ -169,12 +163,3 @@ class CharacterViewSet(viewsets.ModelViewSet):
         serialized_character = CharacterSerializer(
             user_character, context={'request': request}).data
         return Response(serialized_character, status=status.HTTP_200_OK)
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
