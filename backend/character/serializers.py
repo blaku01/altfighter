@@ -1,11 +1,11 @@
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from django.utils import timezone
-
 from character.models import Character, Mission
+from character.utils import when_mission_ends
+from django.contrib.auth.models import User
+from django.utils import timezone
 from item.models import Item
 from item.serializers import ItemSerializer
-from character.utils import when_mission_ends
+from rest_framework import serializers
+
 
 class StatsSerializer(serializers.Serializer):
     strength = serializers.IntegerField(min_value=0)
@@ -17,14 +17,15 @@ class StatsSerializer(serializers.Serializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
+        fields = ["url", "username", "email", "groups"]
 
 
 class MissionSerializer(serializers.HyperlinkedModelSerializer):
     total_time = serializers.SerializerMethodField()
+
     class Meta:
         model = Mission
-        fields = ['id', 'name', 'exp', 'currency', 'time', 'total_time']
+        fields = ["id", "name", "exp", "currency", "time", "total_time"]
 
     def get_total_time(self, obj):
         if obj.time_started == None:
@@ -38,9 +39,20 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Character
-        fields = ['url', 'nickname', 'level', 'current_exp', 'currency', 'strength',
-                  'agility', 'vitality', 'luck', 'total_stats', 'equipped_items']
-        read_only_fields = ('level', 'battle_points', 'current_exp')
+        fields = [
+            "url",
+            "nickname",
+            "level",
+            "current_exp",
+            "currency",
+            "strength",
+            "agility",
+            "vitality",
+            "luck",
+            "total_stats",
+            "equipped_items",
+        ]
+        read_only_fields = ("level", "battle_points", "current_exp")
         depth = 0
 
     def get_total_stats(self, obj):
@@ -51,22 +63,26 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['base_stats'] = {}
-        representation['base_stats']['strength'] = representation.pop(
-            'strength')
-        representation['base_stats']['agility'] = representation.pop('agility')
-        representation['base_stats']['vitality'] = representation.pop(
-            'vitality')
-        representation['base_stats']['luck'] = representation.pop('luck')
+        representation["base_stats"] = {}
+        representation["base_stats"]["strength"] = representation.pop("strength")
+        representation["base_stats"]["agility"] = representation.pop("agility")
+        representation["base_stats"]["vitality"] = representation.pop("vitality")
+        representation["base_stats"]["luck"] = representation.pop("luck")
         return representation
 
     def create(self, validated_data):
         character = Character.objects.create(
-            **validated_data, created_by=self.context['request'].user, strength=0, agility=0, vitality=0, luck=0)
+            **validated_data,
+            created_by=self.context["request"].user,
+            strength=0,
+            agility=0,
+            vitality=0,
+            luck=0
+        )
         return character
 
 
 class CharacterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
-        fields = ['url', 'nickname', 'battle_points']
+        fields = ["url", "nickname", "battle_points"]

@@ -1,5 +1,7 @@
 import factory
+
 from ..models import Character
+
 
 class CharacterFactory(factory.django.DjangoModelFactory):
     class Meta:

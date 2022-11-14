@@ -1,11 +1,12 @@
-from users.models import User
-from django.db import models
 from character.utils import when_mission_ends
-from django.utils import timezone
-from item.models import Item, WEAPON
 from common.models import Stats
+from django.db import models
 from django.db.models import Q
+from django.utils import timezone
+from item.models import WEAPON, Item
 from numpy import power
+from users.models import User
+
 
 class CharacterManager(models.Manager):
     def get(self, id):
@@ -19,6 +20,8 @@ class CharacterManager(models.Manager):
 
             character.save()
         return character
+
+
 # Create your models here.
 class Character(Stats):
     WARRIOR = 1
@@ -26,31 +29,29 @@ class Character(Stats):
     MAGE = 3
 
     CHARACTER_CLASSES = (
-        (WARRIOR, 'warrior'),
-        (HUNTER, 'hunter'),
-        (MAGE, 'mage'),
+        (WARRIOR, "warrior"),
+        (HUNTER, "hunter"),
+        (MAGE, "mage"),
     )
     nickname = models.CharField(null=True, unique=True, max_length=10)
-    created_by = models.OneToOneField(
-        User, null=True, on_delete=models.CASCADE)
-    type = models.PositiveSmallIntegerField(
-        choices=CHARACTER_CLASSES, null=True
-    )
+    created_by = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    type = models.PositiveSmallIntegerField(choices=CHARACTER_CLASSES, null=True)
     currency = models.IntegerField(null=True, blank=True, default=0)
-    level = models.IntegerField(null=True, blank=True,  default=1)
+    level = models.IntegerField(null=True, blank=True, default=1)
     battle_points = models.IntegerField(null=True, blank=True, default=0)
     current_exp = models.IntegerField(null=True, blank=True, default=0)
     last_attacked_at = models.DateTimeField(null=True, blank=True)
     objects = CharacterManager()
-    
-    #might move fight-related things to utils / Fight app
+
+    # might move fight-related things to utils / Fight app
     @property
     def damage(self):
         weapon = Item.objects.filter(
-            belongs_to=self, equipped=True, type=WEAPON).first()
+            belongs_to=self, equipped=True, type=WEAPON
+        ).first()
         if weapon is not None:
-            return weapon.damage * (1 + self.strength/10)
-        return 1 + self.strength/10
+            return weapon.damage * (1 + self.strength / 10)
+        return 1 + self.strength / 10
 
     @property
     def health(self):
@@ -70,8 +71,7 @@ class Character(Stats):
 
     @property
     def backpack(self):
-        items = Item.objects.filter(
-            belongs_to=self, equipped=False, purchased=True)
+        items = Item.objects.filter(belongs_to=self, equipped=False, purchased=True)
         return items
 
     @property
@@ -90,7 +90,12 @@ class Character(Stats):
             agility += item.agility
             vitality += item.vitality
             luck += item.luck
-        return {'strength': strength, 'agility': agility, 'vitality': vitality, 'luck': luck}
+        return {
+            "strength": strength,
+            "agility": agility,
+            "vitality": vitality,
+            "luck": luck,
+        }
 
     @property
     def missions(self):
@@ -99,9 +104,10 @@ class Character(Stats):
 
     @property
     def fight_cooldown(self):
-        seconds_since_attack = timezone.now().timestamp() - \
-            self.last_attacked_at.timestamp()
-        return seconds_since_attack - 10*60
+        seconds_since_attack = (
+            timezone.now().timestamp() - self.last_attacked_at.timestamp()
+        )
+        return seconds_since_attack - 10 * 60
 
     def level_up_if_possible(self):
         while self.exp_to_next_level <= 0:

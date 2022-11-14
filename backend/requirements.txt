@@ -13,3 +13,4 @@ django-cors-headers
 factory-boy
 django-allauth
 dj-rest-auth
+black

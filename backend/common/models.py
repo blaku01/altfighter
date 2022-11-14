@@ -6,6 +6,7 @@ from django.db import models
 class Stats(models.Model):
     class Meta:
         abstract = True
+
     strength = models.IntegerField(blank=True, null=True, default=0)
     agility = models.IntegerField(blank=True, null=True, default=0)
     vitality = models.IntegerField(blank=True, null=True, default=0)
