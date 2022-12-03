@@ -10,3 +10,4 @@ django-celery-beat
 django-annoying
 numpy
 django-cors-headers
+drf-yasg

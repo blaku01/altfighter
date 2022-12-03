@@ -1,25 +1,30 @@
 import json
+
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
-from character.serializers import CharacterListSerializer, CharacterSerializer
 from rest_framework.routers import SimpleRouter
+from rest_framework.test import APITestCase
+
 from character.models import Character, Item
+from character.serializers import CharacterListSerializer, CharacterSerializer
 from character.views import CharacterViewSet
 
 
 class EquipTestCase(APITestCase):
     def setUp(self):
-        self.user1 = User.objects.create_user(username='user1',
-                                            password='password')
+        self.user1 = User.objects.create_user(username="user1", password="password")
         token = Token.objects.create(user=self.user1)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(nickname='character', created_by=self.user1)
+        self.character = Character.objects.create(
+            nickname="character", created_by=self.user1
+        )
 
-        self.item1 = Item.objects.create(name='sword', type=1, strength=1, agility=2, belongs_to=self.character)
+        self.item1 = Item.objects.create(
+            name="sword", type=1, strength=1, agility=2, belongs_to=self.character
+        )
 
         self.equip_url = reverse("backpack-equip", args=(self.item1.pk,))
 
@@ -41,7 +46,6 @@ class EquipTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-
     def test_equip_not_purchased_item(self):
         self.item1.purchased = False
         self.item1.equipped = False
@@ -53,22 +57,27 @@ class EquipTestCase(APITestCase):
         item = Item.objects.get(pk=self.item1.pk)
         self.assertEqual(item.equipped, False)
 
-    
-
 
 class PurchaseTestCase(APITestCase):
     def setUp(self):
-        self.user1 = User.objects.create_user(username='user1',
-                                            password='password')
+        self.user1 = User.objects.create_user(username="user1", password="password")
         token = Token.objects.create(user=self.user1)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(nickname='character', created_by=self.user1)
+        self.character = Character.objects.create(
+            nickname="character", created_by=self.user1
+        )
 
-        self.item1 = Item.objects.create(name='sword', type=1, strength=1, agility=2, belongs_to=self.character, price=10)
+        self.item1 = Item.objects.create(
+            name="sword",
+            type=1,
+            strength=1,
+            agility=2,
+            belongs_to=self.character,
+            price=10,
+        )
 
         self.equip_url = reverse("shop-purchase", args=(self.item1.pk,))
-
 
     def test_purchase_item(self):
         self.item1.purchased = False
@@ -82,7 +91,6 @@ class PurchaseTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         item = Item.objects.get(pk=self.item1.pk)
         self.assertEqual(item.purchased, True)
-
 
     def test_purchase_item_without_currency(self):
         self.item1.purchased = False
@@ -106,6 +114,4 @@ class PurchaseTestCase(APITestCase):
 
         response = self.client.get(self.equip_url)
 
-
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
