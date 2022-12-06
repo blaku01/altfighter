@@ -113,12 +113,11 @@ class MissionViewSet(viewsets.ViewSet):
 class ArenaViewSet(viewsets.ViewSet):
     def list(self, request):
         player_character = get_object_or_404(Character, created_by=request.user)
-        # check if its users character
-        # randomly generate 3 enemies with simillar battle_points
+       # randomly generate 3 enemies with simillar battle_points
         characters = Character.objects.filter(
             battle_points__range=[
                 player_character.battle_points - 100,
-                player_character + 100,
+                player_character.battle_points + 100,
             ]
         ).order_by("?")[:3]
         serialized_characters = CharacterListSerializer(
@@ -193,8 +192,6 @@ class CharacterViewSet(viewsets.ModelViewSet):
     @action(detail=False, url_path="user_character", url_name="user_character")
     def get_user_character(self, request):
         refresh_character_shops.delay()
-        if isinstance(request.user, AnonymousUser):
-            return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
         user_character = get_object_or_404(Character, created_by=request.user)
         serialized_character = CharacterSerializer(
             user_character, context={"request": request}

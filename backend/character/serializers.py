@@ -75,10 +75,6 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
         character = Character.objects.create(
             **validated_data,
             created_by=self.context["request"].user,
-            strength=0,
-            agility=0,
-            vitality=0,
-            luck=0
         )
         return character
 
