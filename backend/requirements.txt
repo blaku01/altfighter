@@ -11,3 +11,7 @@ django-annoying
 numpy
 django-cors-headers
 drf-yasg
+factory-boy
+django-allauth
+dj-rest-auth
+black

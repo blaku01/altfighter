@@ -1,8 +1,5 @@
 import random
-from multiprocessing.sharedctypes import Value
-from os import link
 
-from django.contrib.auth.models import AnonymousUser, User
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
@@ -16,7 +13,6 @@ from character.serializers import (
     CharacterListSerializer,
     CharacterSerializer,
     MissionSerializer,
-    UserSerializer,
 )
 from character.tasks import refresh_character_missions, refresh_character_shops
 
@@ -197,13 +193,3 @@ class CharacterViewSet(viewsets.ModelViewSet):
             user_character, context={"request": request}
         ).data
         return Response(serialized_character, status=status.HTTP_200_OK)
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-
-    queryset = User.objects.all().order_by("-date_joined")
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]

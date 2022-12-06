@@ -1,11 +1,8 @@
-from django.contrib.auth.models import User
-from django.utils import timezone
-from rest_framework import serializers
-
 from character.models import Character, Mission
 from character.utils import when_mission_ends
-from item.models import Item
+from django.contrib.auth.models import User
 from item.serializers import ItemSerializer
+from rest_framework import serializers
 
 
 class StatsSerializer(serializers.Serializer):
@@ -75,6 +72,10 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
         character = Character.objects.create(
             **validated_data,
             created_by=self.context["request"].user,
+            strength=0,
+            agility=0,
+            vitality=0,
+            luck=0
         )
         return character
 

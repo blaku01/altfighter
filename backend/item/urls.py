@@ -1,7 +1,6 @@
 from django.urls import include, path, reverse
-from rest_framework import routers
-
 from item import views
+from rest_framework import routers
 
 router = routers.SimpleRouter()
 

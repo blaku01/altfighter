@@ -1,14 +1,25 @@
-from datetime import datetime
-
-from django.contrib.auth.models import User
-from django.db import models
-from django.utils import timezone
-from numpy import power
-
 from character.utils import when_mission_ends
 from common.models import Stats
+from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 from item.models import WEAPON, Item
+from numpy import power
+from users.models import User
 
+
+class CharacterManager(models.Manager):
+    def get(self, id):
+        character = super().get_queryset().get(id=id)
+        mission = character.missions.get(~Q(time_started=None))
+        if mission.has_finished:
+            character.currency += mission.currency
+            character.current_exp += mission.exp
+
+            character.level_up_if_possible()
+
+            character.save()
+        return character
 
 # Create your models here.
 class Character(Stats):
@@ -28,11 +39,8 @@ class Character(Stats):
     level = models.IntegerField(null=True, blank=True, default=1)
     battle_points = models.IntegerField(null=True, blank=True, default=0)
     current_exp = models.IntegerField(null=True, blank=True, default=0)
-    last_attacked_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        default=timezone.make_aware(datetime(1000, 1, 1, 1, 1, 1, 1)),
-    )  # TODO: rethink whether throttling is better
+    last_attacked_at = models.DateTimeField(null=True, blank=True)
+    objects = CharacterManager()
 
     # might move fight-related things to utils / Fight app
     @property

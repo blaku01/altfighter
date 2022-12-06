@@ -1,6 +1,5 @@
-from rest_framework import permissions
-
 from character.models import Character
+from rest_framework import permissions
 
 SAFE_METHODS = ["GET", "HEAD", "OPTIONS"]
 

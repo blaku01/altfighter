@@ -4,19 +4,23 @@ services:
     backend:
         build:  ./backend
         container_name: backend
+        env_file:
+            - .local.env
         command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
         volumes:
             - ./backend:/usr/src/app
         ports:
             - "8000:8000"
         depends_on:
-            - db
-    db:
+            - pgdb
+    pgdb:
         image: postgres
         container_name: db
         environment:
             - POSTGRES_PASSWORD=postgres
+        env_file:
+            - .local.env
     redis:
         image: "redis:alpine"
         ports:
-            - "6379:6379"
+            - "6380:6380"

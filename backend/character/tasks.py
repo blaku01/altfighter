@@ -2,6 +2,8 @@ import datetime
 
 import pytz
 from celery import shared_task
+from character.models import Character, Mission
+from character.utils import generate_item_name, generate_place_name
 from django.contrib.auth.models import User
 from django.db import connection
 from numpy import clip, ones
