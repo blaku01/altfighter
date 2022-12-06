@@ -21,7 +21,6 @@ class CharacterManager(models.Manager):
             character.save()
         return character
 
-
 # Create your models here.
 class Character(Stats):
     WARRIOR = 1

@@ -1,5 +1,6 @@
-from common.models import Stats
 from django.db import models
+
+from common.models import Stats
 
 # Create your models here.
 

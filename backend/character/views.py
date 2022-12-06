@@ -1,17 +1,20 @@
 import random
 
-from character.models import Character, Mission
-from character.permissions import HasChampionAlready, IsObjectOwner
-from character.serializers import (CharacterListSerializer,
-                                   CharacterSerializer, MissionSerializer)
-from character.tasks import refresh_character_missions, refresh_character_shops
-from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import Response
+
+from character.models import Character, Mission
+from character.permissions import HasChampionAlready, IsObjectOwner
+from character.serializers import (
+    CharacterListSerializer,
+    CharacterSerializer,
+    MissionSerializer,
+)
+from character.tasks import refresh_character_missions, refresh_character_shops
 
 
 class MissionViewSet(viewsets.ViewSet):
@@ -106,12 +109,11 @@ class MissionViewSet(viewsets.ViewSet):
 class ArenaViewSet(viewsets.ViewSet):
     def list(self, request):
         player_character = get_object_or_404(Character, created_by=request.user)
-        # check if its users character
-        # randomly generate 3 enemies with simillar battle_points
+       # randomly generate 3 enemies with simillar battle_points
         characters = Character.objects.filter(
             battle_points__range=[
                 player_character.battle_points - 100,
-                player_character + 100,
+                player_character.battle_points + 100,
             ]
         ).order_by("?")[:3]
         serialized_characters = CharacterListSerializer(
@@ -186,8 +188,6 @@ class CharacterViewSet(viewsets.ModelViewSet):
     @action(detail=False, url_path="user_character", url_name="user_character")
     def get_user_character(self, request):
         refresh_character_shops.delay()
-        if isinstance(request.user, AnonymousUser):
-            return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
         user_character = get_object_or_404(Character, created_by=request.user)
         serialized_character = CharacterSerializer(
             user_character, context={"request": request}

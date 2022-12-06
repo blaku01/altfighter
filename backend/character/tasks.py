@@ -6,9 +6,12 @@ from character.models import Character, Mission
 from character.utils import generate_item_name, generate_place_name
 from django.contrib.auth.models import User
 from django.db import connection
-from item.models import ITEM_TYPES, Item
 from numpy import clip, ones
 from numpy.random import choice, rand, randint
+
+from character.models import Character, Mission
+from character.utils import generate_item_name, generate_place_name
+from item.models import ITEM_TYPES, Item
 
 
 @shared_task

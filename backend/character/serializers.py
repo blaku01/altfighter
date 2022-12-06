@@ -1,8 +1,6 @@
 from character.models import Character, Mission
 from character.utils import when_mission_ends
 from django.contrib.auth.models import User
-from django.utils import timezone
-from item.models import Item
 from item.serializers import ItemSerializer
 from rest_framework import serializers
 
