@@ -110,7 +110,7 @@ class ArenaViewSet(viewsets.ViewSet):
     def list(self, request):
         player_character = get_object_or_404(Character, created_by=request.user)
        # randomly generate 3 enemies with simillar battle_points
-        characters = Character.objects.filter(
+        characters = Character.objects.exclude(id=player_character.id).filter(
             battle_points__range=[
                 player_character.battle_points - 100,
                 player_character.battle_points + 100,

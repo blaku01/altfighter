@@ -4,25 +4,16 @@ from common.models import Stats
 
 # Create your models here.
 
-WEAPON = 1
-HELMET = 2
-ARMOR = 3
-NECKLEASE = 4
-LEGGINGS = 5
-SHIELD = 6
-ITEM_TYPES = (
-    (WEAPON, "weapon"),
-    (HELMET, "helmet"),
-    (ARMOR, "armor"),
-    (NECKLEASE, "necklease"),
-    (LEGGINGS, "leggings"),
-    (SHIELD, "shield"),
-)
-
-
 class Item(Stats):
-    name = models.CharField(null=True, max_length=10)
-    type = models.PositiveSmallIntegerField(choices=ITEM_TYPES)
+    class ItemType(models.IntegerChoices):
+        WEAPON = 1, "weapon"
+        HELMET = 2, "helmet"
+        ARMOR = 3, "armor"
+        NECKLEASE = 4, "necklease"
+        LEGGINGS = 5, "leggings"
+        SHIELD = 6, "shield"
+    name = models.CharField(null=True, max_length=30)
+    type = models.PositiveSmallIntegerField(choices=ItemType.choices)
     damage = models.IntegerField(blank=True, default=0)
     block_chance = models.IntegerField(blank=True, null=True)
     equipped = models.BooleanField(null=True, blank=True, default=False)

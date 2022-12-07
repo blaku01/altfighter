@@ -5,7 +5,6 @@ from rest_framework import routers
 router = routers.SimpleRouter()
 
 router.register(r"characters", views.CharacterViewSet)
-router.register(r"users", views.UserViewSet)
 router.register(r"missions", views.MissionViewSet, basename="missions")
 router.register(r"arena", views.ArenaViewSet, basename="arena")
 

@@ -3,7 +3,7 @@ from common.models import Stats
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
-from item.models import WEAPON, Item
+from item.models import Item
 from numpy import power
 from users.models import User
 
@@ -46,7 +46,7 @@ class Character(Stats):
     @property
     def damage(self):
         weapon = Item.objects.filter(
-            belongs_to=self, equipped=True, type=WEAPON
+            belongs_to=self, equipped=True, type=Item.ItemType.WEAPON
         ).first()
         if weapon is not None:
             return weapon.damage * (1 + self.strength / 10)

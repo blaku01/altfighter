@@ -38,8 +38,8 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Character
         fields = [
-            "url",
             "nickname",
+            "url",
             "level",
             "current_exp",
             "currency",
@@ -47,10 +47,21 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
             "agility",
             "vitality",
             "luck",
-            "total_stats",
             "equipped_items",
+            "total_stats",
         ]
-        read_only_fields = ("level", "battle_points", "current_exp")
+        read_only_fields = (
+            "url",
+            "level",
+            "current_exp",
+            "currency",
+            "strength",
+            "agility",
+            "vitality",
+            "luck",
+            "equipped_items",
+            "total_stats",
+        )
         depth = 0
 
     def get_total_stats(self, obj):
@@ -61,11 +72,10 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["base_stats"] = {}
-        representation["base_stats"]["strength"] = representation.pop("strength")
-        representation["base_stats"]["agility"] = representation.pop("agility")
-        representation["base_stats"]["vitality"] = representation.pop("vitality")
-        representation["base_stats"]["luck"] = representation.pop("luck")
+        representation["base_stats"] = {
+            stat: representation.pop(stat)
+            for stat in ["strength", "agility", "vitality", "luck"]
+        }
         return representation
 
     def create(self, validated_data):

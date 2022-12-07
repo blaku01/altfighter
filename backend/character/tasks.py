@@ -4,14 +4,14 @@ import pytz
 from celery import shared_task
 from character.models import Character, Mission
 from character.utils import generate_item_name, generate_place_name
-from django.contrib.auth.models import User
+from users.models import User
 from django.db import connection
 from numpy import clip, ones
 from numpy.random import choice, rand, randint
 
 from character.models import Character, Mission
 from character.utils import generate_item_name, generate_place_name
-from item.models import ITEM_TYPES, Item
+from item.models import Item
 
 
 @shared_task
@@ -31,7 +31,7 @@ def refresh_character_shops():
                 lvl = character.level
                 numbers = rand(6, 4) * lvl * 2
                 # if character.type == WARRIOR -> ITEM CAN BE A SHIELD
-                item_type_len = len(ITEM_TYPES) - 1
+                item_type_len = len(Item.ItemType) - 1
                 if character.type == "warrior":
                     item_type_len += 1
                 types = randint(1, item_type_len + 1, 6)
