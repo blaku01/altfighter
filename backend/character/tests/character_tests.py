@@ -1,20 +1,20 @@
 import json
 
 from character.models import Character
-from django.contrib.auth.models import User
+from users.models import User
 from django.urls import reverse
 from item.models import Item
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-
+from users.factories import UserFactory
 
 class CharacterCreateTestCase(APITestCase):
 
     character_create_url = reverse("character-list")
 
     def setUp(self):
-        self.user1 = User.objects.create_user(username="user1", password="password")
+        self.user1 = UserFactory()
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
@@ -34,7 +34,7 @@ class CharacterCreateTestCase(APITestCase):
 
 class CharacterTotalStatsTestCase(APITestCase):
     def setUp(self):
-        self.user1 = User.objects.create_user(username="user1", password="password")
+        self.user1 = UserFactory()
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 

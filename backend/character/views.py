@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 
 from django.http import Http404
@@ -16,17 +17,19 @@ from character.serializers import (
 )
 from character.tasks import refresh_character_missions, refresh_character_shops
 
-
+import pytz
 class MissionViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     # get mission list
     def list(self, request):
+        print("starting")
         character = get_object_or_404(Character, created_by=request.user)
-        refresh_character_shops.delay()
         # check if any of character missions has ended
         mission_ended = False
+        print(f"\n\n\n\n {character.missions}")
         for mission in character.missions:
+            print(f"\n mission {mission.time_started} \n")
             if mission.time_started is not None:
                 if mission.has_finished:
                     mission_ended = mission
@@ -38,7 +41,9 @@ class MissionViewSet(viewsets.ViewSet):
                     ).data
                     return Response(serialized_mission, status=status.HTTP_200_OK)
         # if mission has finished grant character resources from it
+
         if mission_ended:
+            print("MISSION ENDED! \n\n\n uwu")
             character.currency += mission_ended.currency
             character.current_exp += mission_ended.exp
 
@@ -128,45 +133,76 @@ class ArenaViewSet(viewsets.ViewSet):
         url_name="fight",
     )
     def fight(self, request, enemy_pk):
-        player_character = get_object_or_404(Character, created_by=request.user)
-        enemy_character = get_object_or_404(Character, pk=enemy_pk)
-
-        # if character fight is on cooldown, return 403
+        """
+        This function simulates a fight between two characters.
+        
+        Inputs:
+            request: HTTP request object
+            enemy_pk: Primary key of the enemy character
+        
+        Output:
+            HTTP status code and response data
+        
+        Assumptions/Limitations:
+            - The function assumes that the enemy character exists and is accessible.
+            - The function assumes that the player character has a valid `fight_cooldown` value.
+        """
+        
+        # Get the player and enemy characters
+        try:
+            player_character = Character.objects.get(created_by=request.user)
+            enemy_character = Character.objects.get(pk=enemy_pk)
+        except Character.DoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Return a 403 status code if the player character is on cooldown
         if player_character.fight_cooldown is None:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        player_character.last_attacked_at = now()
-        player_dmg = player_character.damage
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Set the last attacked time for the player character
+        player_character.last_attacked_at = pytz.timezone('UTC').localize(datetime.utcnow())
+        
+        # Calculate the damage and critical hit chance for each character
+        player_damage = player_character.damage
         player_hp_left = player_character.health
         player_crit_chance = player_character.calculate_crit(enemy_character)
-
-        enemy_dmg = enemy_character.damage
+        enemy_damage = enemy_character.damage
         enemy_hp_left = enemy_character.health
         enemy_crit_chance = enemy_character.calculate_crit(player_character)
+        
+        # Simulate the fight
         battle_log = []
         while True:
-            player_damage_dealt = player_dmg
-            enemy_damage_dealt = enemy_dmg
+            player_damage_dealt = player_damage
+            enemy_damage_dealt = enemy_damage
+            
+            # Calculate the enemy's damage
             if random.random() < enemy_crit_chance:
                 enemy_damage_dealt *= 2
-            # enemy always attacks firsts
-            player_hp_left -= enemy_dmg
+            
+            # Enemy attacks first
+            player_hp_left -= enemy_damage_dealt
             battle_log.append((enemy_damage_dealt, player_hp_left))
+            
+            # Check if the player has lost
             if player_hp_left < 0:
                 player_character.battle_points -= 5
                 player_character.save()
                 print(battle_log)
                 return Response({"battle_log": battle_log}, status=status.HTTP_200_OK)
-
-            # player attacks
+            
+            # Calculate the player's damage
             if random.random() < player_crit_chance:
                 player_damage_dealt *= 2
+            
+            # Player attacks
             enemy_hp_left -= player_damage_dealt
             battle_log.append((player_damage_dealt, enemy_hp_left))
+            
+            # Check if the enemy has lost
             if enemy_hp_left < 0:
                 player_character.battle_points += 10
                 player_character.save()
-                print("\n", battle_log, "\n")
                 return Response({"battle_log": battle_log}, status=status.HTTP_200_OK)
 
 

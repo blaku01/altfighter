@@ -2,7 +2,7 @@ from item.models import Item
 from rest_framework import serializers
 
 
-class ItemSerializer(serializers.HyperlinkedModelSerializer):
+class ItemSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Item

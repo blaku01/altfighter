@@ -1,25 +1,25 @@
-from django.contrib.auth.models import User
+from users.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-
+from users.factories import UserFactory
 from character.models import Character, Mission
-
-
+from character.factories import CharacterFactory
+from datetime import datetime, timedelta
+import pytz
 class MissionTestCase(APITestCase):
     def setUp(self):
-        self.user1 = User.objects.create_user(username="user1", password="password")
+        self.user1 = UserFactory()
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(
-            nickname="character", created_by=self.user1
-        )
+        self.character = CharacterFactory(created_by=self.user1)
+
 
         self.mission1 = Mission.objects.create(
             name="mission1",
-            exp=10,
+            exp=11,
             currency=10,
             time="00:10:00",
             belongs_to=self.character,
@@ -51,10 +51,10 @@ class MissionTestCase(APITestCase):
     def test_get_resources_from_mission(self):
         self.mission1.time = "00:00:00"
         self.mission1.save()
-
         self.client.post(self.mission_url)
         self.client.post(self.missions_url)
-        character = Character.objects.filter(id=self.character.id)[0]
+        self.character.refresh_from_db()
+        character = self.character
         print(character.current_exp, character.level)
         self.assertEqual(character.current_exp, 5)
         self.assertEqual(character.level, 3)

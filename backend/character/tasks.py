@@ -16,49 +16,63 @@ from item.models import Item
 
 @shared_task
 def refresh_character_shops():
-    with connection.cursor() as cursor:
-        today = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
-        last_week = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
-        users_logged_within_week = User.objects.filter(
-            last_login__range=(last_week, today)
-        ).distinct()
+    now = datetime.datetime.now(pytz.utc)
+    last_week = now - datetime.timedelta(days=7)
+    today = now + datetime.timedelta(days=1)
 
-        for user in users_logged_within_week:
-            character = Character.objects.filter(created_by=user).first()
-            if character is not None:
-                items = character.shop
-                items.delete()
-                lvl = character.level
-                numbers = rand(6, 4) * lvl * 2
-                # if character.type == WARRIOR -> ITEM CAN BE A SHIELD
-                item_type_len = len(Item.ItemType) - 1
-                if character.type == "warrior":
-                    item_type_len += 1
-                types = randint(1, item_type_len + 1, 6)
-                damages = [randint(0, 10) * lvl if type == 1 else 0 for type in types]
-                block_chances = [
-                    clip(rand() * 10 * lvl, 0, 25) if type == 6 else 0 for type in types
-                ]
-                items = Item.objects.bulk_create(
-                    [
-                        Item(
-                            name=generate_item_name(),
-                            type=types[i],
-                            belongs_to=character,
-                            price=numbers[i][0]
-                            + numbers[i][1]
-                            + numbers[i][2]
-                            + numbers[i][3],
-                            damage=damages[i],
-                            block_chance=block_chances[i],
-                            strength=numbers[i][0],
-                            agility=numbers[i][1],
-                            vitality=numbers[i][2],
-                            luck=numbers[i][3],
-                        )
-                        for i in range(6)
-                    ]
+    users_logged_within_week = User.objects.filter(
+        last_login__range=(last_week, today)
+    ).distinct()
+
+    items = []
+    for user in users_logged_within_week:
+        character = Character.objects.filter(created_by=user).first()
+        if character is not None:
+            # Delete the existing items in the character's shop
+            character.shop.delete()
+            lvl = character.level
+            numbers = rand(6, 4) * lvl * 2
+            # if character.type == WARRIOR -> ITEM CAN BE A SHIELD
+            # Generate the types list using a list comprehension
+            item_types = [randint(1, len(Item.ItemType)) for _ in range(6)]
+
+            # Use a dictionary to map item types to the corresponding damage value
+            item_type_damages = {
+                Item.ItemType.WEAPON: lambda lvl: randint(0, 10) * lvl,
+                # Other item types have 0 damage
+                Item.ItemType.ARMOR: lambda lvl: 0,
+                Item.ItemType.NECKLEASE: lambda lvl: 0,
+                Item.ItemType.LEGGINGS: lambda lvl: 0,
+                Item.ItemType.SHIELD: lambda lvl: 0,
+            }
+            # Use a list comprehension to calculate the damages for each item
+            # based on its type and level
+            damages = [item_type_damages[type](lvl) for type in item_types]
+            # Use the clip() method to ensure that the block_chances values are within the range 0 to 25
+            block_chances = clip(rand(6) * 10 * lvl, 0, 25)
+
+            # Generate the items for the character and append them to the items list
+            items += [
+                Item(
+                    name=generate_item_name(),
+                    type=item_types[i],
+                    belongs_to=character,
+                    price=numbers[i][0]
+                    + numbers[i][1]
+                    + numbers[i][2]
+                    + numbers[i][3],
+                    damage=damages[i],
+                    block_chance=block_chances[i],
+                    strength=numbers[i][0],
+                    agility=numbers[i][1],
+                    vitality=numbers[i][2],
+                    luck=numbers[i][3],
                 )
+                for i in range(6)
+            ]
+
+    # Save all of the items to the database using the bulk_create() method
+    Item.objects.bulk_create(items)
 
 
 @shared_task

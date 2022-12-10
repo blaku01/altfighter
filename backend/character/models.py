@@ -7,19 +7,26 @@ from item.models import Item
 from numpy import power
 from users.models import User
 
-
 class CharacterManager(models.Manager):
-    def get(self, id):
-        character = super().get_queryset().get(id=id)
-        mission = character.missions.get(~Q(time_started=None))
-        if mission.has_finished:
+    def get(self, pk=None, created_by=None):
+        character = super().get_queryset()
+
+        if created_by:
+            character = character.get(created_by=created_by)
+        else:
+            character = character.get(pk=pk)
+
+        # Get the current mission, if one exists
+        mission = character.missions.filter(~Q(time_started=None)).first()
+        if mission and mission.has_finished:
             character.currency += mission.currency
             character.current_exp += mission.exp
 
             character.level_up_if_possible()
-
             character.save()
+
         return character
+
 
 # Create your models here.
 class Character(Stats):
@@ -32,7 +39,7 @@ class Character(Stats):
         (HUNTER, "hunter"),
         (MAGE, "mage"),
     )
-    nickname = models.CharField(null=True, unique=True, max_length=10)
+    nickname = models.CharField(null=True, unique=True, max_length=30)
     created_by = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     type = models.PositiveSmallIntegerField(choices=CHARACTER_CLASSES, null=True)
     currency = models.IntegerField(null=True, blank=True, default=0)
@@ -103,6 +110,8 @@ class Character(Stats):
 
     @property
     def fight_cooldown(self):
+        if not self.last_attacked_at:
+            return 0
         seconds_since_attack = (
             timezone.now().timestamp() - self.last_attacked_at.timestamp()
         )
