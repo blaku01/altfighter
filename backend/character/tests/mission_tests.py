@@ -1,10 +1,9 @@
+from character.models import Character, Mission
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-
-from character.models import Character, Mission
 
 
 class MissionTestCase(APITestCase):
@@ -13,9 +12,7 @@ class MissionTestCase(APITestCase):
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(
-            nickname="character", created_by=self.user1
-        )
+        self.character = Character.objects.create(nickname="character", created_by=self.user1)
 
         self.mission1 = Mission.objects.create(
             name="mission1",

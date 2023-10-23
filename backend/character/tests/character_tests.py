@@ -10,7 +10,6 @@ from rest_framework.test import APITestCase
 
 
 class CharacterCreateTestCase(APITestCase):
-
     character_create_url = reverse("character-list")
 
     def setUp(self):
@@ -19,16 +18,12 @@ class CharacterCreateTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
     def test_character_create(self):
-        response = self.client.post(
-            self.character_create_url, {"nickname": "character"}
-        )
+        response = self.client.post(self.character_create_url, {"nickname": "character"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_character_create_un_authenticated(self):
         self.client.force_authenticate(user=None)
-        response = self.client.post(
-            self.character_create_url, {"nickname": "character"}
-        )
+        response = self.client.post(self.character_create_url, {"nickname": "character"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -38,12 +33,8 @@ class CharacterTotalStatsTestCase(APITestCase):
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(
-            nickname="character", created_by=self.user1
-        )
-        self.characters_url = reverse(
-            "character-detail", kwargs={"pk": self.character.pk}
-        )
+        self.character = Character.objects.create(nickname="character", created_by=self.user1)
+        self.characters_url = reverse("character-detail", kwargs={"pk": self.character.pk})
 
     def test_total_stats(self):
         Item.objects.create(
@@ -70,6 +61,4 @@ class CharacterTotalStatsTestCase(APITestCase):
 
         total_stats = self.character.total_stats
 
-        self.assertEqual(
-            total_stats, {"strength": 3, "agility": 4, "vitality": 1, "luck": 4}
-        )
+        self.assertEqual(total_stats, {"strength": 3, "agility": 4, "vitality": 1, "luck": 4})
