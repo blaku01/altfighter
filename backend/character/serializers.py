@@ -26,7 +26,7 @@ class MissionSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["id", "name", "exp", "currency", "time", "total_time"]
 
     def get_total_time(self, obj):
-        if obj.time_started is None:
+        if obj.time_started == None:
             return None
         return int(when_mission_ends(obj))
 
@@ -73,7 +73,8 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation["base_stats"] = {
-            stat: representation.pop(stat) for stat in ["strength", "agility", "vitality", "luck"]
+            stat: representation.pop(stat)
+            for stat in ["strength", "agility", "vitality", "luck"]
         }
         return representation
 

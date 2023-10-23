@@ -1,9 +1,10 @@
-from character.models import Character
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
+
+from character.models import Character
 
 
 class FightTestCase(APITestCase):
@@ -23,7 +24,9 @@ class FightTestCase(APITestCase):
             created_by=self.user1,
         )
 
-        self.character2 = Character.objects.create(nickname="character2", created_by=self.user2)
+        self.character2 = Character.objects.create(
+            nickname="character2", created_by=self.user2
+        )
 
         self.fighting_url = reverse("arena-fight", args=(self.character2.pk,))
 

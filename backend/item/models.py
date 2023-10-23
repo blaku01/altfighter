@@ -1,8 +1,8 @@
-from common.models import Stats
 from django.db import models
 
-# Create your models here.
+from common.models import Stats
 
+# Create your models here.
 
 class Item(Stats):
     class ItemType(models.IntegerChoices):
@@ -12,7 +12,6 @@ class Item(Stats):
         NECKLEASE = 4, "necklease"
         LEGGINGS = 5, "leggings"
         SHIELD = 6, "shield"
-
     name = models.CharField(null=True, max_length=30)
     type = models.PositiveSmallIntegerField(choices=ItemType.choices)
     damage = models.IntegerField(blank=True, default=0)
