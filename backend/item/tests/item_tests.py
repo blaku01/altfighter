@@ -1,10 +1,9 @@
+from character.models import Character, Item
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-
-from character.models import Character, Item
 
 
 class EquipTestCase(APITestCase):
@@ -13,9 +12,7 @@ class EquipTestCase(APITestCase):
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(
-            nickname="character", created_by=self.user1
-        )
+        self.character = Character.objects.create(nickname="character", created_by=self.user1)
 
         self.item1 = Item.objects.create(
             name="sword", type=1, strength=1, agility=2, belongs_to=self.character
@@ -59,9 +56,7 @@ class PurchaseTestCase(APITestCase):
         token = Token.objects.create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        self.character = Character.objects.create(
-            nickname="character", created_by=self.user1
-        )
+        self.character = Character.objects.create(nickname="character", created_by=self.user1)
 
         self.item1 = Item.objects.create(
             name="sword",

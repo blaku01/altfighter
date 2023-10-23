@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Item
         fields = [
@@ -17,6 +18,6 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
             "luck",
             "damage",
         ]
-    
+
     def get_type(self, obj):
         return obj.ItemType.choices[obj.type][1]

@@ -230,8 +230,6 @@ def generate_item_name():
 
 def when_mission_ends(mission):
     time_left = (
-        mission.time.minute * 60
-        + mission.time_started.timestamp()
-        - timezone.now().timestamp()
+        mission.time.minute * 60 + mission.time_started.timestamp() - timezone.now().timestamp()
     )
     return time_left

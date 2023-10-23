@@ -1,12 +1,5 @@
 import random
 
-from django.http import Http404
-from django.shortcuts import get_object_or_404
-from django.utils.timezone import now
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.views import Response
-
 from character.models import Character, Mission
 from character.permissions import HasChampionAlready, IsObjectOwner
 from character.serializers import (
@@ -15,6 +8,12 @@ from character.serializers import (
     MissionSerializer,
 )
 from character.tasks import refresh_character_missions, refresh_character_shops
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.views import Response
 
 
 class MissionViewSet(viewsets.ViewSet):
@@ -76,9 +75,7 @@ class MissionViewSet(viewsets.ViewSet):
             # start and return mission
             mission.time_started = now()
             mission.save()
-            serialized_mission = MissionSerializer(
-                mission, context={"request": request}
-            ).data
+            serialized_mission = MissionSerializer(mission, context={"request": request}).data
             return Response(serialized_mission, status=status.HTTP_200_OK)
         raise Http404
 
@@ -91,9 +88,7 @@ class MissionViewSet(viewsets.ViewSet):
     )
     def cancel_mission(self, request, mission_pk):
         user_character = get_object_or_404(Character, created_by=request.user)
-        user_mission = get_object_or_404(
-            Mission, belongs_to=user_character, pk=mission_pk
-        )
+        user_mission = get_object_or_404(Mission, belongs_to=user_character, pk=mission_pk)
         if not user_mission.has_started:
             return Response(
                 {"status": "You need to start mission first"},
@@ -101,21 +96,23 @@ class MissionViewSet(viewsets.ViewSet):
             )
         user_mission.time_started = None
         user_mission.save()
-        return Response(
-            {"status": "Successfully canceled mission"}, status=status.HTTP_200_OK
-        )
+        return Response({"status": "Successfully canceled mission"}, status=status.HTTP_200_OK)
 
 
 class ArenaViewSet(viewsets.ViewSet):
     def list(self, request):
         player_character = get_object_or_404(Character, created_by=request.user)
-       # randomly generate 3 enemies with simillar battle_points
-        characters = Character.objects.exclude(id=player_character.id).filter(
-            battle_points__range=[
-                player_character.battle_points - 100,
-                player_character.battle_points + 100,
-            ]
-        ).order_by("?")[:3]
+        # randomly generate 3 enemies with simillar battle_points
+        characters = (
+            Character.objects.exclude(id=player_character.id)
+            .filter(
+                battle_points__range=[
+                    player_character.battle_points - 100,
+                    player_character.battle_points + 100,
+                ]
+            )
+            .order_by("?")[:3]
+        )
         serialized_characters = CharacterListSerializer(
             characters, many=True, context={"request": request}
         ).data
@@ -171,9 +168,7 @@ class ArenaViewSet(viewsets.ViewSet):
 
 
 class CharacterViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows Characters to be viewed.
-    """
+    """API endpoint that allows Characters to be viewed."""
 
     permissions = [HasChampionAlready, IsObjectOwner]
 

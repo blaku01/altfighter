@@ -1,10 +1,11 @@
+from math import pow
+
 from character.utils import when_mission_ends
 from common.models import Stats
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 from item.models import Item
-from numpy import power
 from users.models import User
 
 
@@ -20,6 +21,7 @@ class CharacterManager(models.Manager):
 
             character.save()
         return character
+
 
 # Create your models here.
 class Character(Stats):
@@ -61,7 +63,7 @@ class Character(Stats):
 
     @property
     def exp_to_next_level(self):
-        return power(self.level, 2) - self.current_exp
+        return pow(self.level, 2) - self.current_exp
 
     @property
     def equipped_items(self):
@@ -103,9 +105,7 @@ class Character(Stats):
 
     @property
     def fight_cooldown(self):
-        seconds_since_attack = (
-            timezone.now().timestamp() - self.last_attacked_at.timestamp()
-        )
+        seconds_since_attack = timezone.now().timestamp() - self.last_attacked_at.timestamp()
         return seconds_since_attack - 10 * 60
 
     def level_up_if_possible(self):

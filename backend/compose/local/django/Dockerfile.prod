@@ -1,0 +1,8 @@
+FROM python:3
+ENV PYTHONUNBUFFERED=1
+WORKDIR /usr/src/app
+COPY . .
+# Run the image as a non-root user
+RUN pip install -r requirements.txt
+RUN useradd myuser
+USER myuser

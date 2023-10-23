@@ -11,9 +11,7 @@ class ShopViewSet(viewsets.ViewSet):
     def list(self, request):
         character = get_object_or_404(Character, created_by=request.user)
         shop = character.shop
-        serialized_item = ItemSerializer(
-            shop, many=True, context={"request": request}
-        ).data
+        serialized_item = ItemSerializer(shop, many=True, context={"request": request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     # buy an item
@@ -33,9 +31,7 @@ class ShopViewSet(viewsets.ViewSet):
             )
         if len(item.belongs_to.backpack) > 5:
             return Response(
-                {
-                    "status": "you dont have enough space in your backpack to purchase this item!"
-                },
+                {"status": "you dont have enough space in your backpack to purchase this item!"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         if item.purchased:
@@ -54,9 +50,7 @@ class BackpackViewSet(viewsets.ViewSet):
     def list(self, request):
         character = get_object_or_404(Character, created_by=request.user)
         backpack = character.backpack
-        serialized_item = ItemSerializer(
-            backpack, many=True, context={"request": request}
-        ).data
+        serialized_item = ItemSerializer(backpack, many=True, context={"request": request}).data
         return Response(serialized_item, status=status.HTTP_200_OK)
 
     @action(
@@ -81,9 +75,7 @@ class BackpackViewSet(viewsets.ViewSet):
         # if item2 of the same type as item1 is equipped - unequip the item2 and equip item1
         if item.type in [item.type for item in item.belongs_to.equipped_items]:
             char = Character.objects.filter(created_by=request.user).first()
-            item_eq = Item.objects.filter(
-                belongs_to=char, equipped=True, name=item.name
-            ).first()
+            item_eq = Item.objects.filter(belongs_to=char, equipped=True, name=item.name).first()
             item_eq.equipped = False
             item_eq.save()
             item.equipped = True
@@ -109,6 +101,4 @@ class BackpackViewSet(viewsets.ViewSet):
         character.currency += item.price / 2
         character.save()
         item.delete()
-        return Response(
-            {"status": "Successfully sold item!"}, status=status.HTTP_403_FORBIDDEN
-        )
+        return Response({"status": "Successfully sold item!"}, status=status.HTTP_403_FORBIDDEN)

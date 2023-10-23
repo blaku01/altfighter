@@ -4,14 +4,11 @@ import pytz
 from celery import shared_task
 from character.models import Character, Mission
 from character.utils import generate_item_name, generate_place_name
-from users.models import User
 from django.db import connection
-from numpy import clip, ones
-from numpy.random import choice, rand, randint
-
-from character.models import Character, Mission
-from character.utils import generate_item_name, generate_place_name
 from item.models import Item
+from numpy import clip, ones
+from numpy.random import rand, randint
+from users.models import User
 
 
 @shared_task
@@ -45,10 +42,7 @@ def refresh_character_shops():
                             name=generate_item_name(),
                             type=types[i],
                             belongs_to=character,
-                            price=numbers[i][0]
-                            + numbers[i][1]
-                            + numbers[i][2]
-                            + numbers[i][3],
+                            price=numbers[i][0] + numbers[i][1] + numbers[i][2] + numbers[i][3],
                             damage=damages[i],
                             block_chance=block_chances[i],
                             strength=numbers[i][0],
